@@ -1,5 +1,15 @@
 [
   {
+    "id": "mmsaadm0ybkl",
+    "title": "Chapter 1 — Population, Sample, And The Sampling Distribution",
+    "filename": "Chapter 1 — Population, Sample, and the Sampling Distribution.html",
+    "url": "https://tinyimprove-rgb.github.io/Stat/Chapter 1 — Population, Sample, and the Sampling Distribution.html",
+    "category": "Statistical Inference",
+    "desc": "",
+    "added": "2026-03-15",
+    "autoAdded": false
+  },
+  {
     "id": "demo1",
     "title": "Normal Distribution",
     "desc": "Gaussian PDF, CDF, and key properties.",
