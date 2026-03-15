@@ -37,14 +37,5 @@
     "filename": "normal-distribution.html",
     "category": "Distributions",
     "added": "2024-01-01"
-  },
-  {
-    "id": "demo2",
-    "title": "Bayes' Theorem",
-    "desc": "Updating beliefs with conditional probability.",
-    "url": "https://tinyimprove-rgb.github.io/Stat/bayes.html",
-    "filename": "bayes.html",
-    "category": "Probability",
-    "added": "2024-01-02"
   }
 ]
