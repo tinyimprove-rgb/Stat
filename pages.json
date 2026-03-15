@@ -28,14 +28,5 @@
     "desc": "",
     "added": "2026-03-15",
     "autoAdded": false
-  },
-  {
-    "id": "demo1",
-    "title": "Normal Distribution",
-    "desc": "Gaussian PDF, CDF, and key properties.",
-    "url": "https://tinyimprove-rgb.github.io/Stat/normal-distribution.html",
-    "filename": "normal-distribution.html",
-    "category": "Distributions",
-    "added": "2024-01-01"
   }
 ]
