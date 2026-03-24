@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inferential Statistics — MIT Study Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f3;
+    --cream: #f2ede3;
+    --rust: #c0392b;
+    --gold: #d4a843;
+    --slate: #4a5568;
+    --muted: #8a8a9a;
+    --border: #ddd8cc;
+    --code-bg: #eee9df;
+    --highlight: #fff3cd;
+    --insight-bg: #e8f4f0;
+    --insight-border: #2d7a5f;
+    --def-bg: #f0eaf7;
+    --def-border: #7c5cbf;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ── Page Layout ── */
+  .page-wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  /* ── Header ── */
+  .doc-header {
+    border-bottom: 2px solid var(--ink);
+    padding: 3.5rem 0 2rem;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  .doc-header::before {
+    content: 'MIT 18.650 · Inferential Statistics';
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1rem;
+  }
+  .doc-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .doc-header h1 em {
+    font-style: italic;
+    color: var(--rust);
+  }
+  .doc-meta {
+    margin-top: 1rem;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── Table of Contents ── */
+  .toc {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--ink);
+    padding: 1.5rem 2rem;
+    margin-bottom: 3rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .toc-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .toc ol {
+    padding-left: 1.25rem;
+    counter-reset: toc;
+    list-style: none;
+  }
+  .toc li {
+    counter-increment: toc;
+    line-height: 2;
+  }
+  .toc li::before {
+    content: counter(toc, decimal-leading-zero) ". ";
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--rust);
+  }
+  .toc a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 1px dashed var(--border);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .toc a:hover { color: var(--rust); border-color: var(--rust); }
+
+  /* ── Sections ── */
+  section {
+    margin-bottom: 3.5rem;
+  }
+  section + section { border-top: 1px solid var(--border); padding-top: 3rem; }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  h2 .sec-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--rust);
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 2rem 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--slate);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  p { margin-bottom: 1rem; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── Definition Box ── */
+  .def-box {
+    background: var(--def-bg);
+    border-left: 4px solid var(--def-border);
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .def-box .def-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--def-border);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  .def-box p { margin-bottom: 0.5rem; }
+
+  /* ── Insight Box ── */
+  .insight-box {
+    background: var(--insight-bg);
+    border-left: 4px solid var(--insight-border);
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .insight-box .insight-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--insight-border);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── Warning / Caution Box ── */
+  .caution-box {
+    background: #fff8ec;
+    border-left: 4px solid var(--gold);
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .caution-box .caution-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #a07800;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── Formula Block ── */
+  .formula-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem 1.75rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .formula-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── Key Term ── */
+  strong.term {
+    color: var(--rust);
+    font-weight: 600;
+  }
+
+  /* ── Bullet Lists ── */
+  ul.content-list {
+    padding-left: 0;
+    list-style: none;
+    margin: 1rem 0;
+  }
+  ul.content-list li {
+    padding: 0.35rem 0 0.35rem 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+  }
+  ul.content-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--rust);
+    font-weight: 700;
+  }
+
+  ol.content-list {
+    padding-left: 0;
+    list-style: none;
+    counter-reset: item;
+    margin: 1rem 0;
+  }
+  ol.content-list li {
+    counter-increment: item;
+    padding: 0.35rem 0 0.35rem 2rem;
+    position: relative;
+    font-size: 0.95rem;
+  }
+  ol.content-list li::before {
+    content: counter(item) ".";
+    position: absolute;
+    left: 0;
+    color: var(--rust);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    top: 0.5rem;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.75rem 0;
+    font-size: 0.88rem;
+  }
+  thead {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  thead th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 500;
+  }
+  tbody tr:nth-child(even) { background: var(--cream); }
+  tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  tbody td:first-child {
+    font-weight: 600;
+    color: var(--rust);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  /* ── Code inline ── */
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+  }
+
+  /* ── Sidebar pull-quote ── */
+  .pull-quote {
+    float: right;
+    width: 38%;
+    margin: 0 0 1.5rem 2rem;
+    padding: 1rem 1.25rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 4px;
+    clear: right;
+  }
+  .pull-quote cite {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-style: normal;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ── Examples ── */
+  .example-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .example-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--rust);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 0 6px 6px;
+  }
+  .example-card .card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .example-card p { font-size: 0.88rem; margin-bottom: 0.4rem; }
+
+  /* ── Divider ── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .pull-quote { float: none; width: 100%; margin: 1rem 0; }
+    .example-grid { grid-template-columns: 1fr; }
+    table { font-size: 0.78rem; }
+    tbody td:first-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- ══════════ HEADER ══════════ -->
+  <header class="doc-header">
+    <h1>Statistical Modeling &amp; <em>Estimation Theory</em></h1>
+    <div class="doc-meta">
+      <span>Lecture 2 · Chapter 2</span>
+      <span>Instructor: Philippe Rigollet</span>
+      <span>MIT 18.650 — Statistics for Applications</span>
+    </div>
+  </header>
+
+  <!-- ══════════ TOC ══════════ -->
+  <nav class="toc" aria-label="Table of Contents">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#motivation">Motivation for Statistical Modeling</a></li>
+      <li><a href="#setup">The Standard Statistical Setup</a></li>
+      <li><a href="#models">Parametric vs. Non-Parametric Models</a></li>
+      <li><a href="#formal">Formal Definition: Statistical Experiment</a></li>
+      <li><a href="#examples">Examples of Statistical Models</a></li>
+      <li><a href="#identifiability">Model Identifiability</a></li>
+      <li><a href="#estimators">Estimators and Their Properties</a></li>
+      <li><a href="#bias-variance">Bias–Variance Decomposition</a></li>
+      <li><a href="#confidence">Confidence Intervals (Review)</a></li>
+    </ol>
+  </nav>
+
+  <!-- ══════════ 1. MOTIVATION ══════════ -->
+  <section id="motivation">
+    <h2><span class="sec-num">§1</span> Motivation for Statistical Modeling</h2>
+
+    <p>Suppose you collect a dataset — for instance, the number of siblings (including oneself) reported by college students. The raw data is a list of positive integers. How should we make sense of it?</p>
+
+    <div class="pull-quote">
+      "All models are wrong, but some of them are useful."
+      <cite>— Attributed to George Box</cite>
+    </div>
+
+    <p>One naive approach is to record the exact fraction of observations equal to each value. But this is inefficient: with a small sample, rare values receive zero probability mass even when they almost certainly exist in the population. The remedy is <strong class="term">statistical modeling</strong>: choosing a structured family of distributions that compresses information, enables inference, and generalizes beyond the observed data.</p>
+
+    <h3>The Modeling Trade-off</h3>
+    <p>A good model must satisfy two competing demands:</p>
+    <ul class="content-list">
+      <li><strong>Rich enough</strong> to plausibly contain the true distribution generating the data.</li>
+      <li><strong>Simple enough</strong> (few parameters) that those parameters can be estimated accurately from a finite sample.</li>
+    </ul>
+
+    <div class="insight-box">
+      <div class="insight-label">Key Intuition</div>
+      <p>Injecting prior knowledge into a model reduces the work the data must do. Fewer parameters to estimate means more accurate estimates from the same sample size. The fewer the degrees of freedom you leave to chance, the better your estimators can perform.</p>
+    </div>
+
+    <h4>Worked Example: Number of Siblings</h4>
+    <p>Observed integers $\{1, 2, 3, \ldots, 7^+\}$ suggest seven free probabilities to estimate — but a sample of 20 students will likely assign zero probability to families of 4 or more simply by chance, not because such families do not exist. By fitting a <strong class="term">Poisson distribution</strong> with a single parameter $\lambda$, we:</p>
+    <ul class="content-list">
+      <li>Reduce the estimation problem from 7 parameters to <strong>1</strong>.</li>
+      <li>Guarantee that every integer value receives a strictly positive probability (since $e^{-\lambda} > 0$).</li>
+      <li>Use information from small values to constrain estimates at large values.</li>
+    </ul>
+  </section>
+
+  <!-- ══════════ 2. SETUP ══════════ -->
+  <section id="setup">
+    <h2><span class="sec-num">§2</span> The Standard Statistical Setup</h2>
+
+    <p>Throughout this course, the standard assumption is:</p>
+
+    <div class="def-box">
+      <div class="def-label">Core Assumption</div>
+      <p>Observations $X_1, X_2, \ldots, X_n$ are <strong class="term">independent and identically distributed (i.i.d.)</strong> with some unknown distribution $P$.</p>
+      <p>Written: $X_1, \ldots, X_n \overset{\text{i.i.d.}}{\sim} P$</p>
+    </div>
+
+    <p><strong>Why i.i.d.?</strong> Independence enables us to combine observations (take averages, apply the Law of Large Numbers). Identical distribution ensures all observations are measuring the same underlying phenomenon. Without these, no coherent global inference is possible.</p>
+
+    <h3>Types of Assumptions on $P$</h3>
+    <p>We can constrain the unknown distribution $P$ at various levels of specificity:</p>
+
+    <table>
+      <thead>
+        <tr><th>Assumption Level</th><th>Example</th><th>Degrees of Freedom</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>No assumption</td><td>Any distribution on $\mathbb{R}$</td><td>Infinite</td></tr>
+        <tr><td>Density exists</td><td>$P$ has a pdf $f$</td><td>Infinite (all densities)</td></tr>
+        <tr><td>Smooth density</td><td>$f$ is $k$-times differentiable</td><td>Infinite, but structured</td></tr>
+        <tr><td>Parametric family</td><td>$\text{Poisson}(\lambda)$, $\mathcal{N}(\mu,\sigma^2)$</td><td>Finite — 1 or 2 parameters</td></tr>
+        <tr><td>Known distribution</td><td>$\mathcal{N}(\mu, \sigma_0^2)$, $\sigma_0^2$ known</td><td>1 (only $\mu$ unknown)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══════════ 3. PARAMETRIC vs NON-PARAMETRIC ══════════ -->
+  <section id="models">
+    <h2><span class="sec-num">§3</span> Parametric vs. Non-Parametric Models</h2>
+
+    <div class="def-box">
+      <div class="def-label">Parametric Model</div>
+      <p>A model in which the unknown distribution $P$ is fully described by a finite-dimensional parameter vector $\theta \in \Theta \subseteq \mathbb{R}^d$. This course focuses primarily on the case $d = 1$ (one-dimensional $\theta$).</p>
+    </div>
+
+    <div class="def-box">
+      <div class="def-label">Non-Parametric Model</div>
+      <p>A model in which the parameter space is infinite-dimensional — for example, when $P$ is characterized by an unknown density function $f$, and the class of all valid densities is the parameter space. Histograms are the canonical non-parametric estimation tool, as they estimate $f$ without assuming any specific functional form.</p>
+    </div>
+
+    <div class="caution-box">
+      <div class="caution-label">Important Distinction</div>
+      <p>"Non-parametric" does not mean "parameter-free." It means the parameter (e.g., a function) lives in an infinite-dimensional space. In practice, any implementation truncates this space.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ 4. FORMAL DEFINITION ══════════ -->
+  <section id="formal">
+    <h2><span class="sec-num">§4</span> Formal Definition: Statistical Experiment</h2>
+
+    <div class="def-box">
+      <div class="def-label">Definition — Statistical Model</div>
+      <p>Let $X_1, \ldots, X_n$ be $n$ i.i.d. random variables in some measurable space $E$ (usually $E \subseteq \mathbb{R}$), with common distribution $\mathbb{P}$. A <strong class="term">statistical model</strong> associated to this experiment is a pair</p>
+      $$\bigl(E,\;(\mathbb{P}_\theta)_{\theta \in \Theta}\bigr)$$
+      <p>where:</p>
+      <ul class="content-list" style="margin-top:0.5rem">
+        <li>$E$ is the <strong class="term">sample space</strong> — the set of values a single observation can take.</li>
+        <li>$(\mathbb{P}_\theta)_{\theta \in \Theta}$ is a <strong class="term">family of probability distributions</strong> on $E$.</li>
+        <li>$\Theta$ is any set, called the <strong class="term">parameter set</strong>.</li>
+      </ul>
+    </div>
+
+    <h3>Well-Specified Models</h3>
+
+    <div class="def-box">
+      <div class="def-label">Definition — Well-Specified</div>
+      <p>A model is <strong class="term">well-specified</strong> if there exists a <strong class="term">true parameter</strong> $\theta \in \Theta$ such that $\mathbb{P} = \mathbb{P}_\theta$ — that is, the true data-generating distribution belongs to the assumed model family.</p>
+    </div>
+
+    <p>We typically work under the well-specified assumption, while acknowledging (after Box) that no model is perfectly correct. Misspecification is an active research area; for this course, we assume the model is accurate enough to be useful.</p>
+
+    <h3>The True Parameter</h3>
+    <p>The particular $\theta$ for which $\mathbb{P} = \mathbb{P}_\theta$ is called the <strong class="term">true parameter</strong>. It is unknown. The aim of the statistical experiment is to <em>estimate</em> $\theta$, or to check properties of $\theta$ when they carry special meaning — for example: Is $\theta > 2$? Is $\theta = 1/2$? Is $\theta \neq 0$?</p>
+
+    <p>For this course, we always assume $\Theta \subseteq \mathbb{R}^d$ for some $d \geq 1$ — making the model <strong class="term">parametric</strong>.</p>
+
+    <div class="insight-box">
+      <div class="insight-label">Why Parameters Matter Beyond Distributions</div>
+      <p>In many applications the parameter has direct scientific meaning, independent of the distribution it implies. Examples: a drug's true efficacy score ($\theta > 2$?), an election proportion ($\theta = 1/2$?), a regression coefficient ($\theta \neq 0$?). Because these are precise yes/no questions, they can often be answered more accurately than a full estimate of $\theta$ with confidence bounds — you are injecting more structure, so the data needs to do less work.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ 5. EXAMPLES ══════════ -->
+  <section id="examples">
+    <h2><span class="sec-num">§5</span> Examples of Statistical Models</h2>
+
+    <div class="example-grid">
+      <div class="example-card">
+        <div class="card-title">1. Bernoulli Trials</div>
+        <p>$\bigl(\{0,1\},\,(\text{Ber}(p))_{p\in(0,1)}\bigr)$</p>
+        <p>$\Theta = (0,1)$</p>
+        <p><em>Example:</em> Does a couple kiss leaning right? $X_i = 1$ if yes.</p>
+      </div>
+      <div class="example-card">
+        <div class="card-title">2. Exponential</div>
+        <p>$\bigl(\mathbb{R}^*_+,\,(\text{Exp}(\lambda))_{\lambda>0}\bigr)$</p>
+        <p>$\Theta = (0,+\infty)$</p>
+        <p><em>Example:</em> Waiting time between subway arrivals.</p>
+      </div>
+      <div class="example-card">
+        <div class="card-title">3. Poisson</div>
+        <p>$\bigl(\mathbb{N},\,(\text{Poiss}(\lambda))_{\lambda>0}\bigr)$</p>
+        <p>$\Theta = (0,+\infty)$</p>
+        <p><em>Example:</em> Number of siblings; counts of rare events.</p>
+      </div>
+      <div class="example-card">
+        <div class="card-title">4. Gaussian (Full)</div>
+        <p>$\bigl(\mathbb{R},\,(\mathcal{N}(\mu,\sigma^2))_{(\mu,\sigma^2)\in\mathbb{R}\times\mathbb{R}^*_+}\bigr)$</p>
+        <p>$\Theta = \mathbb{R} \times (0,+\infty)$</p>
+        <p>Two-dimensional parameter: $\theta = (\mu, \sigma^2)$.</p>
+      </div>
+      <div class="example-card">
+        <div class="card-title">5. Gaussian (Known Variance)</div>
+        <p>$\bigl(\mathbb{R},\,(\mathcal{N}(\mu,\sigma_0^2))_{\mu\in\mathbb{R}}\bigr)$</p>
+        <p>$\Theta = \mathbb{R}$ (only $\mu$ unknown)</p>
+        <p><em>Example:</em> Lab instrument with manufacturer-specified $\sigma_0^2$ on the label.</p>
+      </div>
+      <div class="example-card">
+        <div class="card-title">6. Uniform</div>
+        <p>$\bigl([0,1],\,(\text{Uniform}[0,\theta])_{\theta>0}\bigr)$</p>
+        <p>$\Theta = (0,+\infty)$</p>
+        <p><em>Note:</em> The sample space $[0,1]$ must <em>not</em> depend on the unknown $\theta$.</p>
+      </div>
+    </div>
+
+    <h3>Poisson PMF (Reference)</h3>
+    <p>If $X \sim \text{Poisson}(\lambda)$, then for $x = 0, 1, 2, \ldots$:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Poisson PMF</div>
+      $$P(X = x) = \frac{\lambda^x e^{-\lambda}}{x!}$$
+    </div>
+
+    <p>This PMF is strictly positive for all $x \geq 0$ and all $\lambda > 0$, which is precisely why the Poisson model extrapolates sensibly to unobserved count values.</p>
+
+    <h3>Censored Data: A Special Case</h3>
+    <p>A common real-world complication is <strong class="term">censored (truncated) data</strong>. Suppose the true variable $Y \sim \text{Exp}(\lambda)$ but we can only observe whether $Y > 5$ (e.g., whether a subway delay exceeds 5 minutes). Then:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Censored Observation</div>
+      $$X = \mathbf{1}[Y > 5] \sim \text{Bernoulli}(p), \quad p = P(Y > 5) = \int_5^\infty \lambda e^{-\lambda y}\, dy = e^{-5\lambda}$$
+    </div>
+
+    <p>The model should be reparametrized by $\lambda > 0$ (the scientifically meaningful parameter), not $p$ directly, even though $X$ is Bernoulli.</p>
+  </section>
+
+  <!-- ══════════ 6. IDENTIFIABILITY ══════════ -->
+  <section id="identifiability">
+    <h2><span class="sec-num">§6</span> Model Identifiability</h2>
+
+    <p>Once we estimate the distribution of $X$ exactly, can we recover $\theta$ uniquely? This is the question of <strong class="term">identifiability</strong>.</p>
+
+    <div class="def-box">
+      <div class="def-label">Definition — Identified Parameter</div>
+      <p>The parameter $\theta$ is called <strong class="term">identified</strong> if and only if the map $\theta \in \Theta \mapsto \mathbb{P}_\theta$ is <strong>injective</strong>:</p>
+      $$\theta = \theta' \implies \mathbb{P}_\theta = \mathbb{P}_{\theta'}$$
+      <p style="margin-top:0.5rem">Equivalently (contrapositive): $\mathbb{P}_\theta = \mathbb{P}_{\theta'} \implies \theta = \theta'$.</p>
+      <p>If the parameter is not identifiable, it cannot be recovered even from infinite data.</p>
+    </div>
+
+    <h4>Counterexample: Non-Identifiable Parameterization</h4>
+    <p>Suppose we observe $X_i = \mathbf{1}_{Y_i \geq 0}$, where $Y_1, \ldots, Y_n \overset{\text{i.i.d.}}{\sim} \mathcal{N}(\mu, \sigma^2)$ for unknown $\mu \in \mathbb{R}$ and $\sigma^2 > 0$, but the $Y_i$ are <em>unobserved</em>. Then:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Bernoulli Parameter as a Function of $(\mu, \sigma)$</div>
+      $$p = P(Y > 0) = P\!\left(\frac{Y - \mu}{\sigma} > -\frac{\mu}{\sigma}\right) = 1 - \Phi\!\left(-\frac{\mu}{\sigma}\right) = \Phi\!\left(\frac{\mu}{\sigma}\right)$$
+    </div>
+
+    <p>Here $\Phi$ is the standard normal CDF. The key observation: $p$ depends on $(\mu, \sigma)$ <strong>only through the ratio $\mu/\sigma$</strong>. Scaling both by the same constant — $(2\mu, 2\sigma)$, $(12\mu, 12\sigma)$, etc. — leaves $p$ unchanged. Thus $\mu$ and $\sigma$ individually are <em>not identifiable</em>.</p>
+
+    <div class="insight-box">
+      <div class="insight-label">Resolution</div>
+      <p>Both $\mu$ and $\sigma^2$ individually are <strong>not identified</strong>, but the ratio $\theta = \mu/\sigma$ <strong>is</strong> identified. The correct reparametrized model uses only $\rho = \mu/\sigma \in \mathbb{R}$ as the parameter: $\big(\{0,1\},\ \{\text{Bernoulli}(\Phi(\rho))\}_{\rho \in \mathbb{R}}\big)$, which is identified. The ratio $\mu/\sigma$ is interpretable as a normalized mean — how large the mean is relative to the standard deviation.</p>
+    </div>
+
+    <p>All four standard parametric families in §5 (Bernoulli, Exponential, Poisson, Gaussian) have identified parameters.</p>
+  </section>
+
+  <!-- ══════════ 7. ESTIMATORS ══════════ -->
+  <section id="estimators">
+    <h2><span class="sec-num">§7</span> Estimators and Their Properties</h2>
+
+    <div class="def-box">
+      <div class="def-label">Definition — Estimator (Statistic)</div>
+      <p>An <strong class="term">estimator</strong> $\hat{\theta}_n$ is any measurable function of the data $X_1, \ldots, X_n$ that does <strong>not</strong> depend on the unknown parameter $\theta$:</p>
+      $$\hat{\theta}_n = \hat{\theta}(X_1, X_2, \ldots, X_n)$$
+      <p style="margin-top:0.5rem">An estimator is also called a <strong class="term">statistic</strong>. A batting average, a sample mean, and a sample maximum are all statistics.</p>
+    </div>
+
+    <p><em>Practical measurability check:</em> given data, can you compute the function? If yes, it is measurable. Problems may arise when functions are defined as infima/suprema over large function spaces that may not be attained.</p>
+
+    <h3>Properties of Estimators</h3>
+
+    <table>
+      <thead>
+        <tr><th>Property</th><th>Formal Statement</th><th>Interpretation</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Unbiasedness</td>
+          <td>$\mathbb{E}[\hat{\theta}_n] = \theta$ for all $\theta$</td>
+          <td>On average over many repetitions, the estimator hits the truth.</td>
+        </tr>
+        <tr>
+          <td>Consistency (weak)</td>
+          <td>$\hat{\theta}_n \xrightarrow{\mathbb{P}} \theta$ as $n \to \infty$ (w.r.t. $\mathbb{P}_\theta$)</td>
+          <td>With more data, the estimator converges in probability to $\theta$.</td>
+        </tr>
+        <tr>
+          <td>Consistency (strong)</td>
+          <td>$\hat{\theta}_n \xrightarrow{\text{a.s.}} \theta$ as $n \to \infty$ (w.r.t. $\mathbb{P}_\theta$)</td>
+          <td>Almost surely converges; $\bar{X}_n$ is strongly consistent by the strong LLN.</td>
+        </tr>
+        <tr>
+          <td>Low Quadratic Risk</td>
+          <td>$\mathbb{E}[|\hat{\theta}_n - \theta|^2] \to 0$</td>
+          <td>Convergence in $L^2$; implies weak consistency.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="caution-box">
+      <div class="caution-label">Unbiasedness Alone is Not Enough</div>
+      <p>Both $\bar{X}_n$ and $X_1$ are unbiased estimators of the Bernoulli parameter $\theta$. Yet $X_1$ ignores all but the first observation — it cannot improve as $n$ grows. Bias is necessary but far from sufficient as a performance criterion.</p>
+    </div>
+
+    <h3>Bias</h3>
+    <div class="def-box">
+      <div class="def-label">Definition — Bias</div>
+      $$\text{Bias}(\hat{\theta}_n) = \mathbb{E}\!\left[\hat{\theta}_n\right] - \theta$$
+      <p>The estimator is <strong class="term">unbiased</strong> if $\mathbb{E}[\hat{\theta}_n] = \theta$, i.e., $\text{Bias}(\hat{\theta}_n) = 0$.</p>
+    </div>
+
+    <h3>Quadratic (L²) Risk</h3>
+    <div class="def-box">
+      <div class="def-label">Definition — Quadratic Risk</div>
+      $$R(\hat{\theta}_n) = \mathbb{E}\!\left[|\hat{\theta}_n - \theta|^2\right]$$
+      <p>The quadratic risk measures the expected squared deviation from the true parameter. It is the primary scalar summary of estimator performance. When $\Theta \subseteq \mathbb{R}$, this decomposes as:</p>
+      $$\text{Quadratic risk} = \text{bias}^2 + \text{variance}$$
+    </div>
+
+    <h4>Example: Bernoulli Sample Mean</h4>
+    <p>Let $X_1, \ldots, X_n \overset{\text{i.i.d.}}{\sim} \text{Bernoulli}(\theta)$, and let $\hat{\theta}_n = \bar{X}_n$.</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Bias</div>
+      $$\mathbb{E}[\bar{X}_n] = \frac{1}{n}\sum_{i=1}^n \mathbb{E}[X_i] = \frac{1}{n} \cdot n\theta = \theta \implies \text{Bias} = 0$$
+    </div>
+
+    <div class="formula-block">
+      <div class="formula-label">Variance (using independence)</div>
+      $$\text{Var}(\bar{X}_n) = \frac{1}{n^2}\sum_{i=1}^n \text{Var}(X_i) = \frac{n \cdot \theta(1-\theta)}{n^2} = \frac{\theta(1-\theta)}{n}$$
+    </div>
+
+    <div class="formula-block">
+      <div class="formula-label">Quadratic Risk</div>
+      $$R(\bar{X}_n) = 0^2 + \frac{\theta(1-\theta)}{n} = \frac{\theta(1-\theta)}{n}$$
+    </div>
+
+    <p>As $n \to \infty$, $R \to 0$, confirming consistency. The risk is maximized at $\theta = \tfrac{1}{2}$ with value $\tfrac{1}{4n}$.</p>
+  </section>
+
+  <!-- ══════════ 8. BIAS-VARIANCE ══════════ -->
+  <section id="bias-variance">
+    <h2><span class="sec-num">§8</span> The Bias–Variance Decomposition</h2>
+
+    <p>The quadratic risk decomposes cleanly into two interpretable components.</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Bias–Variance Decomposition</div>
+      $$\underbrace{\mathbb{E}\!\left[(\hat{\theta}_n - \theta)^2\right]}_{\text{Quadratic Risk}} = \underbrace{\left(\mathbb{E}[\hat{\theta}_n] - \theta\right)^2}_{\text{Bias}^2} + \underbrace{\mathbb{E}\!\left[\left(\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n]\right)^2\right]}_{\text{Variance}}$$
+    </div>
+
+    <h3>Derivation Sketch</h3>
+    <p>Add and subtract $\mathbb{E}[\hat{\theta}_n]$ inside the square:</p>
+    <div class="formula-block">
+      <div class="formula-label">Expanding the Squared Error</div>
+      $$(\hat{\theta}_n - \theta)^2 = \Bigl[(\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n]) + (\mathbb{E}[\hat{\theta}_n] - \theta)\Bigr]^2$$
+      $$= \underbrace{(\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n])^2}_{\text{variance term}} + 2\underbrace{(\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n])}_{\text{zero-mean r.v.}} \cdot \underbrace{(\mathbb{E}[\hat{\theta}_n] - \theta)}_{\text{constant}} + (\mathbb{E}[\hat{\theta}_n] - \theta)^2$$
+    </div>
+    <p>Taking expectations: the cross-term vanishes because $\mathbb{E}[\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n]] = 0$, leaving exactly the bias–variance decomposition above.</p>
+
+    <h3>Comparing Three Estimators of $\theta$ (Bernoulli)</h3>
+
+    <table>
+      <thead>
+        <tr><th>Estimator</th><th>Bias</th><th>Variance</th><th>Quadratic Risk</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>$\bar{X}_n$</td>
+          <td>$0$</td>
+          <td>$\theta(1-\theta)/n$</td>
+          <td>$\theta(1-\theta)/n$</td>
+        </tr>
+        <tr>
+          <td>$X_1$ only</td>
+          <td>$0$</td>
+          <td>$\theta(1-\theta)$</td>
+          <td>$\theta(1-\theta)$</td>
+        </tr>
+        <tr>
+          <td>$0.5$ (constant)</td>
+          <td>$0.5 - \theta$</td>
+          <td>$0$</td>
+          <td>$(0.5 - \theta)^2$</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box">
+      <div class="insight-label">Key Insight — Bias-Variance Trade-off</div>
+      <p>The constant estimator $\hat{\theta} = 0.5$ has zero variance (it never fluctuates) but non-zero bias (unless $\theta = 0.5$ exactly). Near $\theta = 0.5$, its risk $(0.5 - \theta)^2$ can be lower than $\bar{X}_n$'s risk $\theta(1-\theta)/n$ for small $n$. As $n$ grows, $\bar{X}_n$ dominates everywhere since its risk shrinks as $1/n$.</p>
+    </div>
+
+    <h3>Consequence: Quadratic Risk $\to 0$ Implies Consistency</h3>
+    <p>If $R(\hat{\theta}_n) = \mathbb{E}[(\hat{\theta}_n - \theta)^2] \to 0$ as $n \to \infty$, then $\hat{\theta}_n \xrightarrow{L^2} \theta$, which implies $\hat{\theta}_n \xrightarrow{P} \theta$ (weak consistency). Moreover, since both bias² and variance are non-negative and must each tend to zero, this simultaneously guarantees:</p>
+    <ul class="content-list">
+      <li><strong>Vanishing bias:</strong> the estimator targets the right value in the limit.</li>
+      <li><strong>Vanishing variance:</strong> fluctuations around the truth shrink to zero.</li>
+    </ul>
+  </section>
+
+  <!-- ══════════ 9. CONFIDENCE INTERVALS ══════════ -->
+  <section id="confidence">
+    <h2><span class="sec-num">§9</span> Confidence Intervals (Review)</h2>
+
+    <div class="def-box">
+      <div class="def-label">Definition — Confidence Interval of Level $1-\alpha$</div>
+      <p>Let $\alpha \in (0,1)$. A <strong class="term">confidence interval (CI) of level $1-\alpha$</strong> for $\theta$ is any random interval $\mathcal{I}$ (depending on $X_1, \ldots, X_n$) whose boundaries do <strong>not</strong> depend on $\theta$, and such that:</p>
+      $$\mathbb{P}_\theta\!\left[\mathcal{I} \ni \theta\right] \geq 1 - \alpha, \quad \forall\, \theta \in \Theta$$
+      <p style="margin-top:0.5rem">The notation $\mathcal{I} \ni \theta$ emphasizes that the randomness lies in the interval $\mathcal{I}$, not in $\theta$.</p>
+    </div>
+
+    <div class="def-box">
+      <div class="def-label">Definition — Asymptotic Confidence Interval</div>
+      <p>A <strong class="term">CI of asymptotic level $1-\alpha$</strong> for $\theta$ is any random interval $\mathcal{I}$ whose boundaries do not depend on $\theta$, and such that:</p>
+      $$\lim_{n \to \infty} \mathbb{P}_\theta\!\left[\mathcal{I} \ni \theta\right] \geq 1 - \alpha, \quad \forall\, \theta \in \Theta$$
+      <p>Asymptotic CIs arise when using the Central Limit Theorem. They may not achieve the nominal coverage level for finite $n$.</p>
+    </div>
+
+    <div class="caution-box">
+      <div class="caution-label">Common Misconception</div>
+      <p>Once you observe data and compute a specific interval, e.g., $[0.42,\ 0.65]$, the statement "$P(\theta \in [0.42, 0.65]) = 0.95$" is <strong>incorrect</strong>. The realized interval is fixed; $\theta$ is also fixed. The probability is either 0 or 1. The $1-\alpha$ probability refers to the <em>procedure</em>: if you repeat the experiment many times, approximately $(1-\alpha) \times 100\%$ of the resulting intervals will contain $\theta$.</p>
+    </div>
+
+    <h3>Construction: Bernoulli CI via CLT</h3>
+    <p>Let $X_1, \ldots, X_n \overset{\text{i.i.d.}}{\sim} \text{Ber}(p)$ for unknown $p \in (0,1)$. By the <strong>Law of Large Numbers</strong>, $\bar{X}_n$ is a strongly consistent estimator of $p$.</p>
+
+    <p>Let $q_{\alpha/2}$ be the $(1 - \tfrac{\alpha}{2})$-quantile of $\mathcal{N}(0,1)$. By the CLT:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Ideal (but infeasible) CI — depends on unknown $p$</div>
+      $$\mathcal{I} = \left[\bar{X}_n - \frac{q_{\alpha/2}\sqrt{p(1-p)}}{\sqrt{n}},\; \bar{X}_n + \frac{q_{\alpha/2}\sqrt{p(1-p)}}{\sqrt{n}}\right]$$
+      $$\lim_{n\to\infty}\mathbb{P}_p\!\left[\mathcal{I} \ni p\right] = 1 - \alpha, \quad \forall\, p \in (0,1)$$
+    </div>
+
+    <div class="caution-box">
+      <div class="caution-label">Problem</div>
+      <p>The interval $\mathcal{I}$ above depends on the unknown parameter $p$ — making it unusable in practice. We need to eliminate $p$ from the bounds.</p>
+    </div>
+
+    <p>Two solutions resolve this:</p>
+
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Interval</th><th>Comment</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Conservative<br>(bound $p(1-p) \leq \tfrac{1}{4}$)</td>
+          <td>$\bar{X}_n \pm \dfrac{q_{\alpha/2}}{2\sqrt{n}}$</td>
+          <td>Replaces $p(1-p)$ with its maximum value $\tfrac{1}{4}$. Always valid; interval is always wider.</td>
+        </tr>
+        <tr>
+          <td>Slutsky<br>(plug-in $\bar{X}_n$ for $p$)</td>
+          <td>$\bar{X}_n \pm q_{\alpha/2}\sqrt{\dfrac{\bar{X}_n(1-\bar{X}_n)}{n}}$</td>
+          <td>By Slutsky's theorem, replacing $p$ with the consistent estimator $\bar{X}_n$ preserves the asymptotic level. Narrower intervals.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Here $q_{\alpha/2}$ is the $(1-\alpha/2)$-quantile of $\mathcal{N}(0,1)$ — e.g., $q_{0.025} \approx 1.96$ for a 95% CI.</p>
+
+    <div class="insight-box">
+      <div class="insight-label">Choosing Between Methods</div>
+      <p>Use the conservative method when valid error bounds are mission-critical and you want guarantees beyond the asymptotic regime. Use Slutsky's method when extracting maximum precision from your data matters and asymptotic validity is acceptable. For finite-sample guarantees with no CLT approximation error, use <strong>Hoeffding's inequality</strong>, at the cost of substantially wider intervals.</p>
+    </div>
+  </section>
+
+  <hr>
+  <p style="font-family:'DM Mono',monospace; font-size:0.72rem; color:var(--muted); text-align:center; padding-top:1rem;">
+    Based on MIT 18.650 — Statistics for Applications · Prof. Philippe Rigollet · MIT OpenCourseWare · CC License
+  </p>
+
+</div>
+</body>
+</html>
