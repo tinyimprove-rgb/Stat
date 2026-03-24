@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIT 18.650 — Inferential Statistics: Confidence Intervals, Convergence & the Delta Method</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    tags: 'ams'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --ink: #1a1410;
+    --ink-light: #3d3028;
+    --ink-faint: #6b5e52;
+    --paper: #faf8f4;
+    --paper-warm: #f3ede3;
+    --paper-card: #ffffff;
+    --rule: #d4c9bb;
+    --accent: #8b3a1e;
+    --accent-light: #c15a38;
+    --accent-pale: #f7ece7;
+    --teal: #1d5e6b;
+    --teal-pale: #e4f1f4;
+    --gold: #9a7b1e;
+    --gold-pale: #faf3db;
+    --green: #2a5c3f;
+    --green-pale: #e5f0eb;
+    --purple: #4a2e6e;
+    --purple-pale: #ede6f7;
+    --mono: 'JetBrains Mono', monospace;
+    --serif-display: 'Playfair Display', Georgia, serif;
+    --serif-body: 'Source Serif 4', Georgia, serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--serif-body);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.75;
+    font-size: 17px;
+    font-weight: 300;
+  }
+
+  /* ── TOP BANNER ── */
+  .course-banner {
+    background: var(--ink);
+    color: #f0ebe3;
+    padding: 12px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .course-banner .badge {
+    background: var(--accent);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--paper-warm);
+    border-bottom: 2px solid var(--rule);
+    padding: 56px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,58,30,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: var(--serif-display);
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 700;
+    line-height: 1.18;
+    color: var(--ink);
+    max-width: 780px;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-sub {
+    color: var(--ink-faint);
+    font-size: 15.5px;
+    font-style: italic;
+    max-width: 640px;
+  }
+  .hero-tags {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 4px 12px;
+    border-radius: 2px;
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 52px 40px 80px;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 56px;
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc-ctr;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 24px;
+  }
+  .toc ol li {
+    counter-increment: toc-ctr;
+    font-size: 14.5px;
+    color: var(--ink-light);
+  }
+  .toc ol li::before {
+    content: counter(toc-ctr, decimal-leading-zero) ". ";
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent-light);
+    margin-right: 4px;
+  }
+  .toc ol li a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .toc ol li a:hover { color: var(--accent); border-color: var(--accent-pale); }
+
+  /* ── SECTION HEADINGS ── */
+  .section {
+    margin-bottom: 64px;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-family: var(--serif-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    border-bottom: 1.5px solid var(--rule);
+    padding-bottom: 10px;
+    margin-bottom: 28px;
+    line-height: 1.25;
+  }
+  h3 {
+    font-family: var(--serif-display);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink-light);
+    margin-top: 36px;
+    margin-bottom: 14px;
+  }
+  h4 {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+  p { margin-bottom: 16px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── FORMULA BLOCKS ── */
+  .formula-block {
+    background: var(--ink);
+    color: #f0ebe3;
+    border-radius: 6px;
+    padding: 22px 28px;
+    margin: 28px 0;
+    text-align: center;
+    font-size: 15px;
+    position: relative;
+    overflow: hidden;
+  }
+  .formula-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+  }
+  .formula-block .formula-label {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,0.45);
+    margin-bottom: 10px;
+  }
+  .formula-inline {
+    font-family: var(--mono);
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+
+  /* ── CALLOUT BOXES ── */
+  .box {
+    border-radius: 5px;
+    padding: 20px 24px;
+    margin: 28px 0;
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+  .box-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .box-title .icon {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+  .box-insight {
+    background: var(--gold-pale);
+    border-left: 3px solid var(--gold);
+  }
+  .box-insight .box-title { color: var(--gold); }
+  .box-insight .box-title .icon { background: var(--gold); color: #fff; }
+  .box-definition {
+    background: var(--teal-pale);
+    border-left: 3px solid var(--teal);
+  }
+  .box-definition .box-title { color: var(--teal); }
+  .box-definition .box-title .icon { background: var(--teal); color: #fff; }
+  .box-warning {
+    background: var(--accent-pale);
+    border-left: 3px solid var(--accent);
+  }
+  .box-warning .box-title { color: var(--accent); }
+  .box-warning .box-title .icon { background: var(--accent); color: #fff; }
+  .box-example {
+    background: var(--green-pale);
+    border-left: 3px solid var(--green);
+  }
+  .box-example .box-title { color: var(--green); }
+  .box-example .box-title .icon { background: var(--green); color: #fff; }
+  .box-theorem {
+    background: var(--purple-pale);
+    border-left: 3px solid var(--purple);
+  }
+  .box-theorem .box-title { color: var(--purple); }
+  .box-theorem .box-title .icon { background: var(--purple); color: #fff; }
+
+  /* ── DEFINITION TERM ── */
+  dfn, .term {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  strong { font-weight: 500; color: var(--ink); }
+
+  /* ── BULLET LISTS ── */
+  ul, ol {
+    padding-left: 22px;
+    margin: 12px 0 16px;
+  }
+  li { margin-bottom: 6px; }
+  li:last-child { margin-bottom: 0; }
+
+  /* ── COMPARISON TABLE ── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 28px 0;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    background: var(--paper-card);
+  }
+  thead { background: var(--ink); color: #f0ebe3; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 13px 18px;
+    text-align: left;
+    font-weight: 500;
+  }
+  tbody tr:nth-child(even) { background: var(--paper-warm); }
+  tbody td {
+    padding: 11px 18px;
+    border-top: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  td:first-child {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--teal);
+    white-space: nowrap;
+  }
+
+  /* ── CONVERGENCE HIERARCHY VISUAL ── */
+  .hierarchy {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 28px;
+    margin: 28px 0;
+    text-align: center;
+  }
+  .hierarchy-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+  }
+  .hier-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .hier-node {
+    background: var(--ink);
+    color: #f0ebe3;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .hier-node.conv-dist {
+    background: var(--accent);
+    font-size: 13px;
+    padding: 10px 22px;
+  }
+  .hier-arrow {
+    color: var(--ink-faint);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .hier-bottom {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin-top: 16px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── STEP-BY-STEP DERIVATION ── */
+  .derivation {
+    counter-reset: step;
+    margin: 24px 0;
+  }
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    align-items: flex-start;
+  }
+  .step-num {
+    counter-increment: step;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 2px;
+  }
+  .step-content { flex: 1; }
+  .step-note {
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 52px 0 0;
+    color: var(--rule);
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--rule);
+  }
+  .divider-mark { font-size: 13px; }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 28px;
+    margin-top: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 620px) {
+    .page { padding: 32px 20px 60px; }
+    .toc ol { grid-template-columns: 1fr; }
+    .course-banner { padding: 10px 20px; flex-direction: column; gap: 6px; }
+    .hero { padding: 36px 20px 30px; }
+    .hier-row { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="course-banner">
+  <span>MIT OpenCourseWare · 18.650 — Fundamentals of Statistics</span>
+  <span class="badge">Lecture Notes</span>
+</div>
+
+<div class="hero">
+  <div class="hero-meta">Prof. Philippe Rigollet · MIT · Lecture 3</div>
+  <h1>Confidence Intervals, Convergence Types, <em>and</em> the Delta Method</h1>
+  <p class="hero-sub">From Hoeffding's inequality and pivotal distributions to Slutsky's theorem and asymptotic confidence intervals for the exponential model.</p>
+  <div class="hero-tags">
+    <span class="tag">Inferential Statistics</span>
+    <span class="tag">Central Limit Theorem</span>
+    <span class="tag">Hoeffding's Inequality</span>
+    <span class="tag">Convergence Types</span>
+    <span class="tag">Slutsky's Theorem</span>
+    <span class="tag">Delta Method</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <nav class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <ol>
+      <li><a href="#s1">Review: Confidence Intervals via CLT</a></li>
+      <li><a href="#s2">Pivotal Distributions</a></li>
+      <li><a href="#s3">Exact Distribution (Small n)</a></li>
+      <li><a href="#s4">Hoeffding's Inequality</a></li>
+      <li><a href="#s5">Types of Convergence</a></li>
+      <li><a href="#s6">Convergence Hierarchy</a></li>
+      <li><a href="#s7">Operations Under Convergence</a></li>
+      <li><a href="#s8">Slutsky's Theorem</a></li>
+      <li><a href="#s9">Exponential Model — CI for λ</a></li>
+      <li><a href="#s10">The Delta Method</a></li>
+    </ol>
+  </nav>
+
+  <!-- ────────────────────────────────── SECTION 1 ── -->
+  <section class="section" id="s1">
+    <div class="section-label">Section 01</div>
+    <h2>Review: Building Confidence Intervals via the CLT</h2>
+
+    <p>We return to the <strong>kiss-direction example</strong>: a sample \(X_1, X_2, \ldots, X_n \overset{\text{iid}}{\sim} \text{Bernoulli}(p)\), where \(p\) is unknown. Our estimator for \(p\) is the sample mean:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Estimator</div>
+      \[\hat{p} = \bar{X}_n = \frac{1}{n}\sum_{i=1}^{n} X_i\]
+    </div>
+
+    <p>Since \(\hat{p}\) is a random variable (an average of random variables), we want to characterize its distribution. The <strong>Central Limit Theorem (CLT)</strong> provides this characterization for large \(n\):</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Central Limit Theorem — Bernoulli Case</div>
+      \[\sqrt{n}\;\frac{\bar{X}_n - p}{\sqrt{p(1-p)}} \xrightarrow{d} \mathcal{N}(0,1) \quad \text{as } n \to \infty\]
+    </div>
+
+    <p>In words: the standardized sample mean converges in distribution to a standard normal. Note the denominator is the <em>standard deviation of \(\bar{X}_n\)</em>, since:</p>
+    <ul>
+      <li>\(\operatorname{Var}(\bar{X}_n) = \frac{p(1-p)}{n}\), so \(\operatorname{SD}(\bar{X}_n) = \sqrt{p(1-p)/n}\).</li>
+      <li>Multiplying by \(\sqrt{n}\) removes the \(n\) in the denominator, leaving \(\sqrt{p(1-p)}\).</li>
+    </ul>
+
+    <h3>Constructing the Confidence Interval</h3>
+
+    <p>From the CLT, for large \(n\):</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Coverage Probability Statement</div>
+      \[P\!\left(\left|\frac{\sqrt{n}(\bar{X}_n - p)}{\sqrt{p(1-p)}}\right| \leq q_{\alpha/2}\right) \approx 1 - \alpha\]
+    </div>
+
+    <p>where \(q_{\alpha/2}\) is the <dfn>upper \(\alpha/2\) quantile</dfn> of the standard normal: \(P(Z > q_{\alpha/2}) = \alpha/2\). Solving this inequality for \(p\) gives a confidence interval. Two practical approaches exist:</p>
+
+    <ol>
+      <li><strong>Solve the quadratic in \(p\)</strong> — exact but algebraically involved (gives the Agresti–Coull-type interval).</li>
+      <li><strong>Bound \(p(1-p) \leq \tfrac{1}{4}\)</strong> — since \(p(1-p) \leq \tfrac{1}{4}\) for all \(p \in [0,1]\), giving the conservative interval:
+        \[\hat{p} \;\pm\; \frac{q_{\alpha/2}}{2\sqrt{n}}\]
+      </li>
+    </ol>
+
+    <div class="box box-insight">
+      <div class="box-title"><span class="icon">★</span> Key Insight — Why does standardization work?</div>
+      If we failed to subtract the mean \(p\) or forgot to divide by \(\sqrt{p(1-p)}\), the limiting distribution would still depend on \(p\) — an unknown parameter. Standardization makes the limit <em>parameter-free</em>. This is the core idea of a <strong>pivotal quantity</strong>.
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 2 ── -->
+  <section class="section" id="s2">
+    <div class="section-label">Section 02</div>
+    <h2>Pivotal Distributions</h2>
+
+    <div class="box box-definition">
+      <div class="box-title"><span class="icon">D</span> Definition — Pivotal Quantity</div>
+      A statistic \(T(X_1,\ldots,X_n;\,\theta)\) is called a <dfn>pivotal quantity</dfn> (or pivot) if its distribution does not depend on any unknown parameters. A pivot may depend exactly (finite \(n\)) or asymptotically (large \(n\)) on no unknowns.
+    </div>
+
+    <p>The standardized sample mean \(\sqrt{n}(\bar{X}_n - p)/\sqrt{p(1-p)}\) is an <em>asymptotic</em> pivot — its limiting distribution \(\mathcal{N}(0,1)\) depends on nothing unknown. This is powerful: we can read quantiles directly from the standard normal table.</p>
+
+    <p>The beauty of the Gaussian distribution in this context is that it has been exhaustively tabulated. For arbitrary distributions, as long as the limiting distribution is parameter-free, we can always compute quantiles via simulation.</p>
+
+    <div class="box box-insight">
+      <div class="box-title"><span class="icon">★</span> Key Insight</div>
+      The goal of asymptotic statistics is: take a good estimator (like \(\bar{X}_n\)) and transform it into a quantity whose limiting distribution is <strong>known and parameter-free</strong>. That transformation is the pivot.
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 3 ── -->
+  <section class="section" id="s3">
+    <div class="section-label">Section 03</div>
+    <h2>Exact Distribution for Small \(n\) — A Counting Argument</h2>
+
+    <p>When the sample size is small (e.g., \(n = 3\)), the CLT approximation is not valid. However, we can compute the <em>exact</em> distribution of \(\bar{X}_3\).</p>
+
+    <h3>Enumerating Values of \(\bar{X}_3\)</h3>
+
+    <p>With \(X_1, X_2, X_3 \overset{\text{iid}}{\sim} \text{Bernoulli}(p)\), each \(X_i \in \{0,1\}\). Their sum \(S = X_1+X_2+X_3\) takes values \(\{0,1,2,3\}\), giving \(\bar{X}_3 = S/3 \in \{0, \tfrac{1}{3}, \tfrac{2}{3}, 1\}\). The number of ways to achieve each value follows from combinatorics:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>\(\bar{X}_3\)</th>
+            <th># of 1's in sample</th>
+            <th>Count (combinations)</th>
+            <th>\(P(\bar{X}_3 = k)\)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>0</td><td>1</td><td>\((1-p)^3\)</td></tr>
+          <tr><td>\(\tfrac{1}{3}\)</td><td>1</td><td>3</td><td>\(\binom{3}{1}p(1-p)^2\)</td></tr>
+          <tr><td>\(\tfrac{2}{3}\)</td><td>2</td><td>3</td><td>\(\binom{3}{2}p^2(1-p)\)</td></tr>
+          <tr><td>1</td><td>3</td><td>1</td><td>\(p^3\)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The counts \(1, 3, 3, 1\) are the binomial coefficients \(\binom{3}{k}\). In fact, \(3\bar{X}_3 \sim \text{Binomial}(3, p)\). The problem is that these probabilities <em>depend on \(p\)</em>, so this distribution is not a pivot — finding confidence intervals requires either solving for \(p\) or using bounds (like Hoeffding's inequality, discussed next).</p>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 4 ── -->
+  <section class="section" id="s4">
+    <div class="section-label">Section 04</div>
+    <h2>Hoeffding's Inequality — A Non-Asymptotic Bound</h2>
+
+    <div class="box box-theorem">
+      <div class="box-title"><span class="icon">T</span> Theorem — Hoeffding's Inequality</div>
+      Let \(X_1, \ldots, X_n\) be independent random variables with \(a_i \leq X_i \leq b_i\) almost surely. Then for any \(\varepsilon > 0\):
+      \[P\!\left(|\bar{X}_n - \mu| \geq \varepsilon\right) \;\leq\; 2\exp\!\left(\!-\frac{2n^2\varepsilon^2}{\sum_{i=1}^n (b_i-a_i)^2}\right)\]
+      For i.i.d. Bernoulli\((p)\) variables (\(a=0, b=1\)): \(\displaystyle P\!\left(|\bar{X}_n - p| \geq \varepsilon\right) \leq 2e^{-2n\varepsilon^2}.\)
+    </div>
+
+    <p>This inequality is <strong>non-asymptotic</strong>: it holds for every fixed \(n\), not just in the limit. It provides a tail bound on \(\bar{X}_n\) without requiring normality.</p>
+
+    <div class="box box-insight">
+      <div class="box-title"><span class="icon">★</span> Geometric Intuition</div>
+      The density of \(\bar{X}_n\) (even if it lacks a smooth density) is always bounded above by a Gaussian-shaped envelope. Hoeffding quantifies this: the tails of any bounded-variable average decay at least as fast as Gaussian tails. The bound is slightly looser than the CLT-based interval by a factor related to \(\sqrt{2\log(2/\alpha)}\) vs \(q_{\alpha/2}\).
+    </div>
+
+    <h3>Deriving a Confidence Interval via Hoeffding</h3>
+
+    <p>Set the bound equal to \(\alpha\) and solve for \(\varepsilon\):</p>
+    <div class="derivation">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          Set \(2e^{-2n\varepsilon^2} = \alpha\)
+          <div class="step-note">We want the tail probability to equal our significance level.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          \(e^{-2n\varepsilon^2} = \alpha/2\), so \(-2n\varepsilon^2 = \log(\alpha/2)\)
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          \(\varepsilon = \sqrt{\dfrac{\log(2/\alpha)}{2n}}\)
+        </div>
+      </div>
+    </div>
+
+    <p>This gives the <strong>Hoeffding confidence interval</strong>:</p>
+    <div class="formula-block">
+      <div class="formula-label">Hoeffding Confidence Interval (level ≥ 1−α)</div>
+      \[P\!\left(p \in \left[\bar{X}_n - \sqrt{\frac{\log(2/\alpha)}{2n}},\;\bar{X}_n + \sqrt{\frac{\log(2/\alpha)}{2n}}\right]\right) \geq 1 - \alpha\]
+    </div>
+
+    <p>Comparing the two margin-of-error formulas:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Margin of Error</th><th>Validity</th><th>Sharpness</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CLT (conservative bound)</td>
+            <td>\(\dfrac{q_{\alpha/2}}{2\sqrt{n}}\)</td>
+            <td>Asymptotic (\(n \geq 30\))</td>
+            <td>Sharper</td>
+          </tr>
+          <tr>
+            <td>Hoeffding</td>
+            <td>\(\sqrt{\dfrac{\log(2/\alpha)}{2n}}\)</td>
+            <td>Any \(n\)</td>
+            <td>Conservative (larger)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-warning">
+      <div class="box-title"><span class="icon">!</span> Important Trade-off</div>
+      The CLT-based interval is narrower (sharper), but relies on the approximation being valid. Hoeffding's interval is always valid — but pays a price in width. In statistics, stronger assumptions enable tighter conclusions. Hoeffding's approach avoids distributional assumptions entirely.
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 5 ── -->
+  <section class="section" id="s5">
+    <div class="section-label">Section 05</div>
+    <h2>Types of Convergence for Random Variables</h2>
+
+    <p>Why do we need different convergence modes? Because random variables live on a probability space, and there are different ways to ask "does \(T_n\) get close to \(T\)?" — depending on how strictly you handle the randomness.</p>
+
+    <div class="box box-definition">
+      <div class="box-title"><span class="icon">D</span> Probability Space Intuition</div>
+      Think of \(\omega\) (omega) as the underlying random object — like a ball of snow. A random variable is a measurable function of \(\omega\): the volume, temperature, or surface area of that ball. Different realizations of the experiment give different \(\omega\)'s.
+    </div>
+
+    <h3>1. Almost Sure Convergence (a.s.)</h3>
+    <div class="formula-block">
+      <div class="formula-label">Definition</div>
+      \[T_n \xrightarrow{a.s.} T \iff P\!\left(\omega : T_n(\omega) \to T(\omega)\right) = 1\]
+    </div>
+    <p><strong>Meaning:</strong> For (almost) every possible realization of the underlying randomness, the sequence \(T_n\) converges to \(T\). The set of "bad" outcomes where it fails has probability zero. This is the strongest mode — it says convergence happens everywhere randomness permits.</p>
+
+    <h3>2. Convergence in Probability</h3>
+    <div class="formula-block">
+      <div class="formula-label">Definition</div>
+      \[T_n \xrightarrow{P} T \iff \forall\,\varepsilon > 0,\quad P(|T_n - T| > \varepsilon) \to 0 \text{ as } n \to \infty\]
+    </div>
+    <p><strong>Meaning:</strong> For each fixed \(n\), there is a small probability that \(T_n\) deviates from \(T\), but this probability shrinks to zero. Slightly weaker than a.s. convergence because it tolerates a residual probability at each \(n\) (as long as it vanishes).</p>
+
+    <h3>3. Convergence in \(L^p\)</h3>
+    <div class="formula-block">
+      <div class="formula-label">Definition</div>
+      \[T_n \xrightarrow{L^p} T \iff \mathbb{E}\!\left[|T_n - T|^p\right] \to 0 \text{ as } n \to \infty\]
+    </div>
+    <p><strong>Meaning:</strong> The \(p\)-th moment of the distance goes to zero. The most common case is \(L^2\): if \(\mathbb{E}[T_n] = 0\) for all \(n\) and \(\operatorname{Var}(T_n) \to 0\), then \(T_n \xrightarrow{L^2} 0\). Intuitively, the random variable concentrates around its mean as its spread vanishes.</p>
+    <p><em>Key property:</em> \(L^p\) convergence implies \(L^q\) convergence for all \(q \leq p\).</p>
+
+    <h3>4. Convergence in Distribution (the one we use most)</h3>
+    <div class="formula-block">
+      <div class="formula-label">Definition</div>
+      \[T_n \xrightarrow{d} T \iff \forall x \text{ where } F_T \text{ is continuous:}\quad F_{T_n}(x) \to F_T(x)\]
+    </div>
+    <p><strong>Meaning:</strong> The cumulative distribution functions converge pointwise at all continuity points. This says nothing about the sample paths \(T_n(\omega)\) themselves — only that the <em>laws</em> (probability distributions) converge.</p>
+
+    <div class="box box-example">
+      <div class="box-title"><span class="icon">E</span> Example — Why Convergence in Distribution is the Weakest</div>
+      Let \(X \sim \mathcal{N}(0,1)\). Then \(X \xrightarrow{d} \mathcal{N}(0,1)\) and \(-X \xrightarrow{d} \mathcal{N}(0,1)\) (by symmetry). Yet \(X + (-X) = 0\) almost surely — certainly not distributed as \(\mathcal{N}(0,2)\). This shows you cannot add limits under mere convergence in distribution. The realizations of \(X\) and \(-X\) are perfectly anticorrelated, but their marginal distributions are identical.
+    </div>
+
+    <h3>Equivalent Characterizations of Convergence in Distribution</h3>
+    <p>The following are equivalent to \(T_n \xrightarrow{d} T\):</p>
+    <ol>
+      <li><strong>CDF convergence</strong>: \(F_{T_n}(x) \to F_T(x)\) at all continuity points (definition above).</li>
+      <li><strong>Bounded continuous functions</strong>: For every bounded continuous \(f:\mathbb{R}\to\mathbb{R}\),
+        \[\mathbb{E}[f(T_n)] \to \mathbb{E}[f(T)].\]
+      </li>
+      <li><strong>Characteristic functions</strong>: For all \(x \in \mathbb{R}\),
+        \[\mathbb{E}[e^{ixT_n}] \to \mathbb{E}[e^{ixT}].\]
+        The CLT is most elegantly proved using this: expand the characteristic function of \(\bar{X}_n\) in a Taylor series and recognize \(e^{-x^2/2}\) — the characteristic function of \(\mathcal{N}(0,1)\) — as the second-order term.
+      </li>
+    </ol>
+
+    <div class="box box-insight">
+      <div class="box-title"><span class="icon">★</span> Why Convergence in Distribution Suffices for Statistics</div>
+      In statistics, we only need to compute probabilities of events involving our estimators. Convergence in distribution guarantees that these probabilities match those of the limiting distribution. We do not need to know that every realization converges — only that the statistical behavior converges.
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 6 ── -->
+  <section class="section" id="s6">
+    <div class="section-label">Section 06</div>
+    <h2>Convergence Hierarchy</h2>
+
+    <p>The different modes of convergence are related by implication. Stronger modes imply weaker ones:</p>
+
+    <div class="hierarchy">
+      <div class="hierarchy-title">Implication Diagram (stronger → weaker)</div>
+      <div class="hier-row">
+        <div class="hier-node">Almost Surely</div>
+        <div class="hier-arrow">⟶</div>
+        <div class="hier-node">In Probability</div>
+        <div class="hier-arrow">⟶</div>
+        <div class="hier-node conv-dist">In Distribution</div>
+      </div>
+      <div class="hier-row" style="margin-top:10px;">
+        <div class="hier-node">\(L^p\) (large \(p\))</div>
+        <div class="hier-arrow">⟶</div>
+        <div class="hier-node">\(L^q\) (\(q \leq p\))</div>
+        <div class="hier-arrow">⟶</div>
+        <div class="hier-node conv-dist">In Distribution</div>
+      </div>
+      <div class="hier-bottom">Every arrow represents: "if converges on the left, also converges on the right"</div>
+    </div>
+
+    <p><strong>Key caveat:</strong> For almost sure, \(L^p\), and in-probability convergence, the limits are "equal almost surely" — the same random variable. For convergence in distribution, the limit is only identified up to its law, not as a specific random variable.</p>
+
+    <h3>Continuous Mapping Theorem (CMT)</h3>
+    <div class="box box-theorem">
+      <div class="box-title"><span class="icon">T</span> Theorem — Continuous Mapping</div>
+      If \(T_n \to T\) (in any of the above senses except \(L^p\)) and \(f\) is a continuous function, then \(f(T_n) \to f(T)\) in the same sense.
+    </div>
+    <p>This is extremely useful: if \(\bar{X}_n \xrightarrow{a.s.} \mu\), then \(1/\bar{X}_n \xrightarrow{a.s.} 1/\mu\) (since \(x \mapsto 1/x\) is continuous away from 0). Similarly for convergence in probability.</p>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 7 ── -->
+  <section class="section" id="s7">
+    <div class="section-label">Section 07</div>
+    <h2>Operations Under Convergence</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Operation</th>
+            <th>Almost Surely</th>
+            <th>In Probability</th>
+            <th>In Distribution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>\(X_n + Y_n \to X + Y\)</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✗ (in general)</td>
+          </tr>
+          <tr>
+            <td>\(X_n Y_n \to XY\)</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✗ (in general)</td>
+          </tr>
+          <tr>
+            <td>\(X_n / Y_n \to X/Y\) (if \(Y \neq 0\))</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✗ (in general)</td>
+          </tr>
+          <tr>
+            <td>\(f(X_n) \to f(X)\) (f continuous)</td>
+            <td>✓ (CMT)</td>
+            <td>✓ (CMT)</td>
+            <td>✓ (CMT)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-warning">
+      <div class="box-title"><span class="icon">!</span> Why This Matters</div>
+      The CLT gives us convergence in distribution. But we often need to combine our CLT result with another quantity (e.g., replacing \(p\) with \(\hat{p}\)). Since convergence in distribution does not generally support arithmetic operations between sequences, we need <strong>Slutsky's Theorem</strong>.
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 8 ── -->
+  <section class="section" id="s8">
+    <div class="section-label">Section 08</div>
+    <h2>Slutsky's Theorem</h2>
+
+    <div class="box box-theorem">
+      <div class="box-title"><span class="icon">T</span> Theorem — Slutsky</div>
+      Let \(X_n \xrightarrow{d} X\) and \(Y_n \xrightarrow{P} c\) where \(c\) is a <strong>deterministic constant</strong> (not a random variable). Then:
+      \[X_n + Y_n \xrightarrow{d} X + c \qquad \text{and} \qquad X_n Y_n \xrightarrow{d} cX\]
+      More generally, the vector \((X_n, Y_n) \xrightarrow{d} (X, c)\), so any continuous function of the pair converges in distribution to that function applied to the limit.
+    </div>
+
+    <div class="box box-insight">
+      <div class="box-title"><span class="icon">★</span> Why the Constant Matters</div>
+      Slutsky's theorem works precisely because \(Y_n\) converges to a <em>constant</em> \(c\) — a degenerate random variable. A constant converges both in probability and in distribution (trivially), and because it is non-random, the joint convergence \((X_n, Y_n) \xrightarrow{d} (X, c)\) follows. This would fail if \(Y_n\) converged only in distribution to a non-degenerate random variable.
+    </div>
+
+    <h3>The Primary Use Case: Plug-In Arguments</h3>
+
+    <p>Consider the standardized estimator:</p>
+    <div class="formula-block">
+      <div class="formula-label">CLT Statement</div>
+      \[\frac{\sqrt{n}(\bar{X}_n - p)}{\sqrt{p(1-p)}} \xrightarrow{d} \mathcal{N}(0,1)\]
+    </div>
+
+    <p>We cannot compute this pivot because \(p\) is unknown. We want to replace \(p\) with \(\hat{p} = \bar{X}_n\). Write:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Decomposition</div>
+      \[\frac{\sqrt{n}(\bar{X}_n - p)}{\sqrt{\hat{p}(1-\hat{p})}} = \underbrace{\frac{\sqrt{n}(\bar{X}_n - p)}{\sqrt{p(1-p)}}}_{\xrightarrow{d}\,\mathcal{N}(0,1)} \times \underbrace{\frac{\sqrt{p(1-p)}}{\sqrt{\hat{p}(1-\hat{p})}}}_{\xrightarrow{P}\,1 \text{ (LLN + CMT)}}\]
+    </div>
+
+    <p>By Slutsky's theorem (the second factor converges in probability to the constant 1), the product converges in distribution to \(\mathcal{N}(0,1) \times 1 = \mathcal{N}(0,1)\). Hence the plug-in pivot is still asymptotically standard normal.</p>
+
+    <div class="box box-warning">
+      <div class="box-title"><span class="icon">!</span> How to Use "By Slutsky" in Your Work</div>
+      Write "by Slutsky" only when you are genuinely combining a sequence that converges in distribution with another that converges in probability to a constant. Do not invoke it for purely deterministic or algebraic steps.
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 9 ── -->
+  <section class="section" id="s9">
+    <div class="section-label">Section 09</div>
+    <h2>Case Study: Exponential Model — Confidence Interval for \(\lambda\)</h2>
+
+    <h3>Setup</h3>
+
+    <p>Observe inter-arrival times \(T_1, \ldots, T_n \overset{\text{iid}}{\sim} \text{Exponential}(\lambda)\). The exponential density is:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Exponential Density</div>
+      \[f(t) = \lambda e^{-\lambda t}, \quad t > 0, \quad \lambda > 0\]
+    </div>
+
+    <p>Key properties:</p>
+    <ul>
+      <li>\(\mathbb{E}[T_i] = 1/\lambda\), \(\quad\operatorname{Var}(T_i) = 1/\lambda^2\).</li>
+      <li><strong>Memoryless property</strong>: \(P(T_1 > t + s \mid T_1 > t) = P(T_1 > s)\). Given you have already waited \(t\) minutes, the remaining wait time has the same distribution as the original wait. This is unique to the exponential among continuous distributions.</li>
+      <li>The exponential distribution is widely used for inter-arrival times in queuing theory and call centers.</li>
+    </ul>
+
+    <h3>Estimating \(\lambda\)</h3>
+
+    <p>Since \(\mathbb{E}[T_i] = 1/\lambda\), we estimate \(1/\lambda\) by \(\bar{T}_n\), and therefore estimate \(\lambda\) by:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Estimator for λ</div>
+      \[\hat{\lambda} = \frac{1}{\bar{T}_n}\]
+    </div>
+
+    <p>This follows the universal heuristic: <em>replace expectations by sample averages, then invert if needed.</em></p>
+
+    <h3>Asymptotic Distribution of \(\hat{\lambda}\)</h3>
+
+    <p>By the CLT applied to \(\bar{T}_n\) (with mean \(1/\lambda\) and variance \(1/\lambda^2\)):</p>
+
+    <div class="formula-block">
+      <div class="formula-label">CLT for the Sample Mean</div>
+      \[\sqrt{n}\,\frac{\bar{T}_n - 1/\lambda}{1/\lambda} \xrightarrow{d} \mathcal{N}(0,1)\]
+    </div>
+
+    <p>Rearranging (multiply by \(\lambda\)):</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Equivalent CLT Statement</div>
+      \[\sqrt{n}\,\lambda(\bar{T}_n - 1/\lambda) = \sqrt{n}\,(\lambda\bar{T}_n - 1) \xrightarrow{d} \mathcal{N}(0,1)\]
+    </div>
+
+    <h3>Direct Confidence Interval for \(\lambda\)</h3>
+
+    <p>From the above pivot, with probability \(1-\alpha\):</p>
+    \[|\sqrt{n}\,\lambda\bar{T}_n - \sqrt{n}| \leq q_{\alpha/2}\]
+
+    <p>Solving for \(\lambda\):</p>
+
+    <div class="formula-block">
+      <div class="formula-label">CI for λ (direct inversion)</div>
+      \[\lambda \in \left[\frac{1 - q_{\alpha/2}/\sqrt{n}}{\bar{T}_n},\;\frac{1 + q_{\alpha/2}/\sqrt{n}}{\bar{T}_n}\right] = \frac{1}{\bar{T}_n}\left(1 \pm \frac{q_{\alpha/2}}{\sqrt{n}}\right)\]
+    </div>
+
+    <p>Note: the width of the interval depends on \(\bar{T}_n\) itself — this is natural, since \(\bar{T}_n\) carries information about both the mean and variance of the exponential distribution.</p>
+  </section>
+
+  <!-- ────────────────────────────────── SECTION 10 ── -->
+  <section class="section" id="s10">
+    <div class="section-label">Section 10</div>
+    <h2>The Delta Method</h2>
+
+    <p>The Delta Method lets us derive the asymptotic distribution of a <em>function</em> of an asymptotically normal estimator. It is essentially a first-order Taylor expansion argument.</p>
+
+    <div class="box box-theorem">
+      <div class="box-title"><span class="icon">T</span> Theorem — Delta Method</div>
+      Suppose \(\sqrt{n}(Z_n - \theta) \xrightarrow{d} \mathcal{N}(0, \sigma^2)\). Let \(g\) be a differentiable function with \(g'(\theta) \neq 0\) and \(g'\) continuous at \(\theta\). Then:
+      \[\sqrt{n}\bigl(g(Z_n) - g(\theta)\bigr) \xrightarrow{d} \mathcal{N}\!\left(0,\;\sigma^2 [g'(\theta)]^2\right)\]
+    </div>
+
+    <h3>Proof Sketch</h3>
+
+    <div class="derivation">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>First-order Taylor expansion:</strong> By the Mean Value Theorem, there exists \(\bar{\theta}\) between \(Z_n\) and \(\theta\) such that:
+          \[g(Z_n) = g(\theta) + (Z_n - \theta)\,g'(\bar{\theta})\]
+          <div class="step-note">This is exact, not approximate — the MVT guarantees such a \(\bar{\theta}\) exists.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Multiply by \(\sqrt{n}\):</strong>
+          \[\sqrt{n}\bigl(g(Z_n) - g(\theta)\bigr) = \underbrace{\sqrt{n}(Z_n - \theta)}_{\xrightarrow{d}\;\mathcal{N}(0,\sigma^2)} \times \underbrace{g'(\bar{\theta})}_{\xrightarrow{P}\;g'(\theta)}\]
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Convergence of \(\bar\theta\):</strong> Since \(Z_n \xrightarrow{P} \theta\) (by LLN) and \(\bar{\theta}\) is sandwiched between \(Z_n\) and \(\theta\), we have \(\bar{\theta} \xrightarrow{P} \theta\) (squeeze theorem). By continuity of \(g'\) and CMT: \(g'(\bar{\theta}) \xrightarrow{P} g'(\theta)\).
+          <div class="step-note">This is where continuity of g' is essential.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Apply Slutsky:</strong> We have (convergence in distribution) × (convergence in probability to a constant). By Slutsky's theorem:
+          \[\sqrt{n}\bigl(g(Z_n)-g(\theta)\bigr) \xrightarrow{d} \mathcal{N}(0,\sigma^2) \times g'(\theta) = \mathcal{N}\!\left(0,\sigma^2[g'(\theta)]^2\right)\]
+        </div>
+      </div>
+    </div>
+
+    <h3>Application: Asymptotic Distribution of \(\hat{\lambda}\)</h3>
+
+    <p>Apply the Delta Method with \(g(x) = 1/x\), \(Z_n = \bar{T}_n\), \(\theta = 1/\lambda\), and \(\sigma^2 = 1/\lambda^2\).</p>
+
+    <ul>
+      <li>\(g'(x) = -1/x^2\)</li>
+      <li>\(g'(\theta) = g'(1/\lambda) = -\lambda^2\)</li>
+      <li>\([g'(\theta)]^2 = \lambda^4\)</li>
+      <li>Asymptotic variance: \(\sigma^2 \cdot [g'(\theta)]^2 = \frac{1}{\lambda^2} \cdot \lambda^4 = \lambda^2\)</li>
+    </ul>
+
+    <div class="formula-block">
+      <div class="formula-label">Asymptotic Normality of λ̂</div>
+      \[\sqrt{n}\,(\hat{\lambda} - \lambda) = \sqrt{n}\!\left(\frac{1}{\bar{T}_n} - \lambda\right) \xrightarrow{d} \mathcal{N}(0,\,\lambda^2)\]
+    </div>
+
+    <h3>Plug-In Confidence Interval via Slutsky</h3>
+
+    <p>The pivot \(\sqrt{n}(\hat\lambda - \lambda)/\lambda\) converges to \(\mathcal{N}(0,1)\). Since \(\lambda\) is unknown, we replace it with \(\hat{\lambda}\). Write:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Decomposition (for Slutsky)</div>
+      \[\frac{\sqrt{n}(\hat\lambda - \lambda)}{\hat\lambda} = \frac{\sqrt{n}(\hat\lambda - \lambda)}{\lambda} \times \frac{\lambda}{\hat\lambda} \xrightarrow{d} \mathcal{N}(0,1) \times 1 = \mathcal{N}(0,1)\]
+    </div>
+
+    <p>Justification: \(\lambda/\hat\lambda \xrightarrow{P} 1\) by LLN + CMT, and \(\lambda/\hat\lambda\) converges to the constant 1. By Slutsky, the product converges to \(\mathcal{N}(0,1)\).</p>
+
+    <p>This yields the <strong>plug-in confidence interval</strong>:</p>
+
+    <div class="formula-block">
+      <div class="formula-label">Asymptotic CI for λ (plug-in)</div>
+      \[\hat\lambda \;\pm\; \frac{q_{\alpha/2}\,\hat\lambda}{\sqrt{n}} = \hat\lambda\left(1 \pm \frac{q_{\alpha/2}}{\sqrt{n}}\right)\]
+    </div>
+
+    <p>This is exactly the same as the interval obtained by direct inversion earlier, confirming consistency of the methods.</p>
+
+    <div class="box box-insight">
+      <div class="box-title"><span class="icon">★</span> Summary — When to Use Each Tool</div>
+      <ul>
+        <li><strong>CLT alone:</strong> asymptotic normality of \(\bar{X}_n\). Pivot requires knowing the variance.</li>
+        <li><strong>Delta Method:</strong> extends CLT to functions of \(\bar{X}_n\). Cost: multiply variance by \([g'(\theta)]^2\).</li>
+        <li><strong>Slutsky:</strong> replaces unknown parameters in the pivot by consistent estimators. Justification: the ratio converges in probability to the constant 1.</li>
+        <li><strong>CMT:</strong> if \(Z_n \to Z\), then \(f(Z_n) \to f(Z)\) for continuous \(f\). Used to show \(\hat\lambda \to \lambda\).</li>
+        <li><strong>Hoeffding:</strong> no asymptotic argument needed; works for any \(n\) but gives a wider interval.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider"><span class="divider-mark">§</span></div>
+
+  <footer class="page-footer">
+    <span>MIT OpenCourseWare · 18.650 Fundamentals of Statistics</span>
+    <span>Prof. Philippe Rigollet · Creative Commons License</span>
+    <span>Study Notes · ocw.mit.edu</span>
+  </footer>
+
+</div>
+</body>
+</html>
