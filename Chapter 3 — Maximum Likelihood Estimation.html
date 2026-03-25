@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maximum Likelihood Estimation — MIT 18.650</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$','$']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --ink-light: #4a3f35;
+    --ink-faint: #8a7a6a;
+    --paper: #faf8f4;
+    --paper-warm: #f5f0e8;
+    --paper-ruled: #ede8df;
+    --accent: #b84c2a;
+    --accent-muted: #d4744f;
+    --accent-faint: #f0d9ce;
+    --blue: #2a5c8a;
+    --blue-faint: #d0e4f5;
+    --green: #2a6640;
+    --green-faint: #d0ead8;
+    --gold: #8a6a1a;
+    --gold-faint: #f5ecd0;
+    --border: #d4c8b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 52px 0 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.025) 40px,
+      rgba(255,255,255,0.025) 41px
+    );
+  }
+  .header-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent-muted);
+    margin-bottom: 14px;
+  }
+  .page-header h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    color: rgba(250,248,244,0.65);
+    margin-top: 10px;
+  }
+
+  /* ── TABLE OF CONTENTS ── */
+  .toc-wrap {
+    max-width: 820px;
+    margin: 40px auto 0;
+    padding: 0 24px;
+  }
+  .toc {
+    background: var(--paper-warm);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 24px 28px;
+    border-radius: 2px;
+  }
+  .toc-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+  .toc ol {
+    padding-left: 20px;
+    column-count: 2;
+    column-gap: 32px;
+  }
+  .toc li {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .toc a { color: var(--blue); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* ── MAIN CONTENT ── */
+  .content {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── SECTION HEADINGS ── */
+  .section {
+    margin-bottom: 64px;
+  }
+  .section-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+  h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 10px;
+    margin-bottom: 24px;
+    line-height: 1.3;
+  }
+  h3 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 32px 0 12px;
+    letter-spacing: 0.01em;
+  }
+  h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-light);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 24px 0 8px;
+  }
+
+  /* ── PROSE ── */
+  p {
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+  strong { color: var(--ink); }
+  em { color: var(--ink-light); }
+
+  /* ── DEFINITION BOX ── */
+  .def-box {
+    background: var(--paper-warm);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--blue);
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  .def-box .box-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+  .def-box p { margin-bottom: 8px; }
+  .def-box p:last-child { margin-bottom: 0; }
+
+  /* ── INSIGHT BOX ── */
+  .insight-box {
+    background: var(--gold-faint);
+    border: 1px solid #c8a84a;
+    border-left: 5px solid var(--gold);
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  .insight-box .box-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  /* ── THEOREM BOX ── */
+  .theorem-box {
+    background: var(--green-faint);
+    border: 1px solid #6aaa82;
+    border-left: 5px solid var(--green);
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  .theorem-box .box-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+
+  /* ── WARNING BOX ── */
+  .warning-box {
+    background: var(--accent-faint);
+    border: 1px solid #d49080;
+    border-left: 5px solid var(--accent);
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  .warning-box .box-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  /* ── FORMULA BLOCK ── */
+  .formula-block {
+    background: var(--paper-ruled);
+    border: 1px solid var(--border);
+    padding: 20px 28px;
+    margin: 20px 0;
+    text-align: center;
+    font-size: 18px;
+    overflow-x: auto;
+    border-radius: 2px;
+  }
+  .formula-block.named {
+    position: relative;
+    padding-top: 28px;
+  }
+  .formula-name {
+    position: absolute;
+    top: 8px; left: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ── DERIVATION STEPS ── */
+  .derivation {
+    background: var(--paper-ruled);
+    border: 1px solid var(--border);
+    padding: 20px 28px;
+    margin: 20px 0;
+    border-radius: 2px;
+    overflow-x: auto;
+  }
+  .derivation .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .derivation .step:last-child { margin-bottom: 0; }
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 28px;
+    padding-top: 2px;
+  }
+  .step-content { flex: 1; }
+  .step-note {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+  }
+  thead tr {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    font-size: 13px;
+  }
+  tbody tr:nth-child(even) { background: var(--paper-warm); }
+  tbody tr:nth-child(odd) { background: var(--paper); }
+  tbody td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  tbody td:first-child { font-weight: 600; color: var(--blue); }
+
+  /* ── BULLET LISTS ── */
+  ul, ol {
+    padding-left: 22px;
+    margin-bottom: 16px;
+  }
+  li { margin-bottom: 8px; line-height: 1.7; }
+  li:last-child { margin-bottom: 0; }
+
+  /* ── CODE / MONO ── */
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em;
+    background: var(--paper-ruled);
+    padding: 1px 5px;
+    border-radius: 2px;
+    color: var(--accent);
+  }
+
+  /* ── PROOF BLOCK ── */
+  .proof {
+    border-left: 3px solid var(--border);
+    padding-left: 20px;
+    margin: 16px 0;
+    font-style: italic;
+    color: var(--ink-light);
+  }
+  .proof-end::after {
+    content: '∎';
+    float: right;
+    font-style: normal;
+    color: var(--ink-faint);
+  }
+
+  /* ── DIVIDER ── */
+  hr.section-rule {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* ── EXAMPLE BLOCK ── */
+  .example-block {
+    border: 1px solid var(--border);
+    margin: 20px 0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .example-header {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+  }
+  .example-body {
+    padding: 18px 20px;
+    background: var(--paper-warm);
+  }
+  .example-body p:last-child { margin-bottom: 0; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .toc ol { column-count: 1; }
+    h2 { font-size: 22px; }
+    .formula-block { font-size: 15px; padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════ PAGE HEADER ════════════════════════════════ -->
+<header class="page-header">
+  <p class="header-eyebrow">MIT 18.650 — Statistics for Applications</p>
+  <h1>Maximum Likelihood Estimation</h1>
+  <p class="header-sub">Chapter 3 — Lecture Notes</p>
+</header>
+
+<!-- ════════════════════════════════ TABLE OF CONTENTS ════════════════════════════════ -->
+<div class="toc-wrap">
+  <nav class="toc">
+    <p class="toc-title">Contents</p>
+    <ol>
+      <li><a href="#s1">Motivation &amp; Goal</a></li>
+      <li><a href="#s2">Total Variation Distance</a></li>
+      <li><a href="#s3">KL Divergence</a></li>
+      <li><a href="#s4">From KL to MLE</a></li>
+      <li><a href="#s5">Maximizing Functions</a></li>
+      <li><a href="#s6">Likelihood &amp; Log-Likelihood</a></li>
+      <li><a href="#s7">Computing the MLE — Examples</a></li>
+      <li><a href="#s8">Fisher Information</a></li>
+      <li><a href="#s9">Asymptotic Properties of MLE</a></li>
+      <li><a href="#s10">Method of Moments</a></li>
+    </ol>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════ CONTENT ════════════════════════════════ -->
+<main class="content">
+
+<!-- ───────────── §1 MOTIVATION ───────────── -->
+<section class="section" id="s1">
+  <span class="section-number">Section 01</span>
+  <h2>Motivation &amp; The Statistician's Goal</h2>
+
+  <p>We observe i.i.d. data \(X_1, \ldots, X_n\) drawn from an unknown true distribution \(\mathbb{P}_{\theta^*}\). Our task is to produce an estimator \(\hat\theta = \hat\theta(X_1,\ldots,X_n)\) such that the <em>estimated distribution</em> \(\mathbb{P}_{\hat\theta}\) is close to the true distribution \(\mathbb{P}_{\theta^*}\).</p>
+
+  <div class="insight-box">
+    <p class="box-label">✦ Key Intuition</p>
+    <p>"Close distributions" means: for <strong>every event</strong> \(A \subseteq E\), \(\left|\mathbb{P}_{\hat\theta}(A) - \mathbb{P}_{\theta^*}(A)\right|\) is small. The worst-case departure over all events defines the <strong>total variation distance</strong>.</p>
+  </div>
+
+  <p>Knowing \(\theta^*\) is a proxy for knowing \(\mathbb{P}_{\theta^*}\) itself. The identification condition ensures one-to-one correspondence between parameters and distributions.</p>
+</section>
+
+<!-- ───────────── §2 TOTAL VARIATION ───────────── -->
+<section class="section" id="s2">
+  <span class="section-number">Section 02</span>
+  <h2>Total Variation Distance</h2>
+
+  <div class="def-box">
+    <p class="box-label">Definition — Total Variation</p>
+    <p>For two probability measures \(\mathbb{P}_\theta\) and \(\mathbb{P}_{\theta'}\) on sample space \(E\):</p>
+    <p>$$\mathrm{TV}(\mathbb{P}_\theta,\mathbb{P}_{\theta'}) = \max_{A \subseteq E}\left|\mathbb{P}_\theta(A) - \mathbb{P}_{\theta'}(A)\right|$$</p>
+    <p>If \(\mathrm{TV}(\mathbb{P}_{\hat\theta}, \mathbb{P}_{\theta^*}) \le 0.01\), then for <em>every</em> event \(A\): \(\mathbb{P}_{\hat\theta}(A) \in \bigl[\mathbb{P}_{\theta^*}(A)\pm 0.01\bigr]\).</p>
+  </div>
+
+  <h3>Computable Forms</h3>
+
+  <p>Computing a max over all subsets of \(E\) is intractable. Fortunately, the total variation simplifies when we have explicit PMFs or densities.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Setting</th><th>Computable Formula</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Discrete \(E\) (PMF \(p_\theta\))</td>
+          <td>\(\displaystyle\mathrm{TV}(\mathbb{P}_\theta,\mathbb{P}_{\theta'}) = \tfrac{1}{2}\sum_{x\in E}\left|p_\theta(x)-p_{\theta'}(x)\right|\)</td>
+        </tr>
+        <tr>
+          <td>Continuous \(E\) (density \(f_\theta\))</td>
+          <td>\(\displaystyle\mathrm{TV}(\mathbb{P}_\theta,\mathbb{P}_{\theta'}) = \tfrac{1}{2}\int_E\left|f_\theta(x)-f_{\theta'}(x)\right|\,dx\)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box">
+    <p class="box-label">✦ Geometric Interpretation</p>
+    <p>For two density curves, \(2\cdot\mathrm{TV}\) equals the area <em>between</em> the two curves — the region where one density exceeds the other.</p>
+  </div>
+
+  <h3>Properties (Metric Axioms)</h3>
+  <ul>
+    <li><strong>Symmetry:</strong> \(\mathrm{TV}(\mathbb{P}_\theta,\mathbb{P}_{\theta'}) = \mathrm{TV}(\mathbb{P}_{\theta'},\mathbb{P}_\theta)\)</li>
+    <li><strong>Non-negativity:</strong> \(\mathrm{TV} \ge 0\)</li>
+    <li><strong>Definiteness:</strong> \(\mathrm{TV}(\mathbb{P}_\theta,\mathbb{P}_{\theta'}) = 0 \iff \mathbb{P}_\theta = \mathbb{P}_{\theta'}\)</li>
+    <li><strong>Triangle inequality:</strong> \(\mathrm{TV}(\mathbb{P}_\theta,\mathbb{P}_{\theta'}) \le \mathrm{TV}(\mathbb{P}_\theta,\mathbb{P}_{\theta''}) + \mathrm{TV}(\mathbb{P}_{\theta''},\mathbb{P}_{\theta'})\)</li>
+  </ul>
+  <p>These four properties confirm that TV is a genuine <em>distance</em> between probability distributions.</p>
+
+  <div class="warning-box">
+    <p class="box-label">⚠ Practical Limitation</p>
+    <p>Although TV has a clear probabilistic meaning, it is <strong>difficult to estimate from data</strong> — there is no simple expression for TV as an expectation under \(\mathbb{P}_{\theta^*}\). This prevents us from replacing it by a sample average. We must use a surrogate.</p>
+  </div>
+</section>
+
+<!-- ───────────── §3 KL DIVERGENCE ───────────── -->
+<section class="section" id="s3">
+  <span class="section-number">Section 03</span>
+  <h2>Kullback–Leibler Divergence</h2>
+
+  <p>The <strong>KL divergence</strong> is a tractable surrogate for total variation that can be estimated from data because it is expressible as an <em>expectation</em>.</p>
+
+  <div class="def-box">
+    <p class="box-label">Definition — KL Divergence</p>
+    $$\mathrm{KL}(\mathbb{P}_\theta, \mathbb{P}_{\theta'}) = \begin{cases} \displaystyle\sum_{x\in E} p_\theta(x)\log\!\frac{p_\theta(x)}{p_{\theta'}(x)} & \text{(discrete)} \\[12pt] \displaystyle\int_E f_\theta(x)\log\!\frac{f_\theta(x)}{f_{\theta'}(x)}\,dx & \text{(continuous)} \end{cases}$$
+    <p>Crucially, the order of arguments matters: \(\mathrm{KL}(\mathbb{P}_\theta,\mathbb{P}_{\theta'}) \ne \mathrm{KL}(\mathbb{P}_{\theta'},\mathbb{P}_\theta)\) in general.</p>
+  </div>
+
+  <h3>Properties</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>TV</th><th>KL</th></tr></thead>
+      <tbody>
+        <tr><td>Symmetric</td><td>✓ Yes</td><td>✗ No (in general)</td></tr>
+        <tr><td>Non-negative</td><td>✓ Yes</td><td>✓ Yes (by Jensen's inequality)</td></tr>
+        <tr><td>Definite (= 0 ⟺ equal)</td><td>✓ Yes</td><td>✓ Yes</td></tr>
+        <tr><td>Triangle inequality</td><td>✓ Yes</td><td>✗ No (in general)</td></tr>
+        <tr><td>Estimable from data</td><td>✗ Hard</td><td>✓ Yes (as an expectation)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Because KL is not symmetric and doesn't satisfy the triangle inequality, it is called a <strong>divergence</strong> rather than a distance. Nevertheless, definiteness is sufficient for our statistical purposes.</p>
+
+  <div class="insight-box">
+    <p class="box-label">✦ Why Asymmetry Helps</p>
+    <p>Placing the <em>true</em> distribution \(\mathbb{P}_{\theta^*}\) in the <strong>first</strong> argument allows us to write the KL as an expectation <em>under \(\mathbb{P}_{\theta^*}\)</em> — the very distribution generating our data. This lets us replace the expectation by a sample average.</p>
+  </div>
+
+  <h3>KL as an Expectation</h3>
+
+  <p>Writing out the KL with \(\mathbb{P}_{\theta^*}\) as the first argument (continuous case):</p>
+
+  <div class="derivation">
+    <div class="step">
+      <span class="step-num">①</span>
+      <div class="step-content">
+        \(\displaystyle\mathrm{KL}(\mathbb{P}_{\theta^*},\mathbb{P}_\theta) = \int f_{\theta^*}(x)\log\frac{f_{\theta^*}(x)}{f_\theta(x)}\,dx\)
+        <p class="step-note">Definition of KL.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">②</span>
+      <div class="step-content">
+        \(\displaystyle = \mathbb{E}_{\theta^*}\!\left[\log f_{\theta^*}(X)\right] - \mathbb{E}_{\theta^*}\!\left[\log f_\theta(X)\right]\)
+        <p class="step-note">Split the logarithm of a ratio.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">③</span>
+      <div class="step-content">
+        \(\displaystyle = \underbrace{\mathbb{E}_{\theta^*}[\log f_{\theta^*}(X)]}_{\text{constant w.r.t. } \theta} - \mathbb{E}_{\theta^*}\!\left[\log f_\theta(X)\right]\)
+        <p class="step-note">The first term is the negative entropy of \(\mathbb{P}_{\theta^*}\) — it does not depend on \(\theta\).</p>
+      </div>
+    </div>
+  </div>
+
+  <p>Minimizing \(\mathrm{KL}(\mathbb{P}_{\theta^*},\mathbb{P}_\theta)\) over \(\theta\) is therefore equivalent to <strong>maximizing</strong> \(\mathbb{E}_{\theta^*}[\log f_\theta(X)]\).</p>
+</section>
+
+<!-- ───────────── §4 FROM KL TO MLE ───────────── -->
+<section class="section" id="s4">
+  <span class="section-number">Section 04</span>
+  <h2>From KL Estimation to MLE</h2>
+
+  <h3>Estimation Strategy</h3>
+  <p>We cannot minimize \(\mathrm{KL}(\mathbb{P}_{\theta^*},\mathbb{P}_\theta)\) directly because \(\mathbb{P}_{\theta^*}\) is unknown. Instead:</p>
+  <ol>
+    <li>Write \(\mathrm{KL}(\mathbb{P}_{\theta^*},\mathbb{P}_\theta)\) as \(\text{const} - \mathbb{E}_{\theta^*}[\log f_\theta(X)]\).</li>
+    <li>Estimate \(\mathbb{E}_{\theta^*}[\log f_\theta(X)]\) by the sample average \(\tfrac{1}{n}\sum_{i=1}^n \log f_\theta(X_i)\) — justified by the Law of Large Numbers.</li>
+    <li>The unknown constant does not affect the <em>minimizer</em> over \(\theta\).</li>
+  </ol>
+
+  <div class="formula-block named">
+    <span class="formula-name">Estimated KL</span>
+    $$\widehat{\mathrm{KL}}(\mathbb{P}_{\theta^*},\mathbb{P}_\theta) = \text{"const"} - \frac{1}{n}\sum_{i=1}^n \log f_\theta(X_i)$$
+  </div>
+
+  <h3>Chain of Equivalences</h3>
+
+  <div class="derivation">
+    <div class="step">
+      <span class="step-num"></span>
+      <div class="step-content">\(\displaystyle\min_{\theta\in\Theta}\,\widehat{\mathrm{KL}}(\mathbb{P}_{\theta^*},\mathbb{P}_\theta)\)</div>
+    </div>
+    <div class="step">
+      <span class="step-num">⟺</span>
+      <div class="step-content">\(\displaystyle\min_\theta\left(-\frac{1}{n}\sum_{i=1}^n\log f_\theta(X_i)\right)\)
+        <p class="step-note">Drop the constant.</p></div>
+    </div>
+    <div class="step">
+      <span class="step-num">⟺</span>
+      <div class="step-content">\(\displaystyle\max_\theta\sum_{i=1}^n\log f_\theta(X_i)\)
+        <p class="step-note">Flip sign; scaling by \(1/n\) does not change the argmax.</p></div>
+    </div>
+    <div class="step">
+      <span class="step-num">⟺</span>
+      <div class="step-content">\(\displaystyle\max_\theta\log\prod_{i=1}^n f_\theta(X_i)\)
+        <p class="step-note">Sum of logs = log of product.</p></div>
+    </div>
+    <div class="step">
+      <span class="step-num">⟺</span>
+      <div class="step-content">\(\displaystyle\max_\theta\prod_{i=1}^n f_\theta(X_i)\)
+        <p class="step-note">Log is strictly increasing; argmax is preserved.</p></div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <p class="box-label">✦ This Is Maximum Likelihood</p>
+    <p>The product \(\prod_{i=1}^n f_\theta(X_i)\) is the <strong>likelihood</strong> function — and maximizing it is precisely <strong>Maximum Likelihood Estimation</strong>. The entire derivation from KL divergence is what gives MLE its theoretical justification.</p>
+  </div>
+</section>
+
+<!-- ───────────── §5 MAXIMIZING FUNCTIONS ───────────── -->
+<section class="section" id="s5">
+  <span class="section-number">Section 05</span>
+  <h2>Interlude: Maximizing Functions</h2>
+
+  <p>MLE reduces to maximizing a function of \(\theta\). Understanding when this is tractable is important.</p>
+
+  <h3>Concavity — the Key Property</h3>
+
+  <div class="def-box">
+    <p class="box-label">Definition — Concave Function (1D)</p>
+    <p>A twice-differentiable function \(h:\Theta\subset\mathbb{R}\to\mathbb{R}\) is <strong>concave</strong> if \(h''(\theta)\le 0\) for all \(\theta\in\Theta\), and <strong>strictly concave</strong> if \(h''(\theta) < 0\).</p>
+    <p><em>Convexity</em> is the negation: \(h''(\theta)\ge 0\). Optimization textbooks use convexity (minimization); we need concavity (maximization).</p>
+  </div>
+
+  <h4>Examples of Strictly Concave Functions</h4>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Function \(h(\theta)\)</th><th>Domain \(\Theta\)</th><th>\(h''(\theta)\)</th></tr></thead>
+      <tbody>
+        <tr><td>\(-\theta^2\)</td><td>\(\mathbb{R}\)</td><td>\(-2 < 0\) ✓</td></tr>
+        <tr><td>\(\sqrt{\theta}\)</td><td>\((0,\infty)\)</td><td>\(-\tfrac{1}{4}\theta^{-3/2} < 0\) ✓</td></tr>
+        <tr><td>\(\log\theta\)</td><td>\((0,\infty)\)</td><td>\(-\theta^{-2} < 0\) ✓</td></tr>
+        <tr><td>\(\sin\theta\)</td><td>\([0,\pi]\)</td><td>\(-\sin\theta \le 0\) ✓</td></tr>
+        <tr><td>\(2\theta - 3\)</td><td>\(\mathbb{R}\)</td><td>\(0\) (concave but <em>not</em> strictly)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Why Concavity Makes Optimization Easy</h3>
+  <ul>
+    <li>A strictly concave function has <strong>at most one local maximum</strong>, which must be the global maximum.</li>
+    <li>To find it: set the derivative (or gradient) to zero and solve.</li>
+    <li>If \(h'(\theta^*) = 0\), then \(\theta^*\) is the <em>unique global maximum</em>.</li>
+    <li>Most classical statistical likelihoods are log-concave — this is precisely why MLE has closed-form solutions.</li>
+  </ul>
+
+  <h3>Multivariate Case</h3>
+  <p>For \(h:\Theta\subset\mathbb{R}^d\to\mathbb{R}\), define:</p>
+  <ul>
+    <li><strong>Gradient:</strong> \(\nabla h(\theta) = \left(\tfrac{\partial h}{\partial\theta_1},\ldots,\tfrac{\partial h}{\partial\theta_d}\right)^\top\in\mathbb{R}^d\)</li>
+    <li><strong>Hessian:</strong> \(\nabla^2 h(\theta)\in\mathbb{R}^{d\times d}\), where entry \((j,k)\) is \(\tfrac{\partial^2 h}{\partial\theta_j\partial\theta_k}\)</li>
+  </ul>
+  <p>\(h\) is concave iff \(x^\top \nabla^2 h(\theta)\, x \le 0\) for all \(x\ne 0\), \(\theta\in\Theta\). To find the maximum: solve \(\nabla h(\theta) = \mathbf{0}\).</p>
+
+  <div class="warning-box">
+    <p class="box-label">⚠ Boundary Warning</p>
+    <p>Setting the derivative to zero only finds an interior maximum. If the log-likelihood is <em>monotone</em> on the parameter space (no interior critical point), the maximum is attained at the <strong>boundary</strong> — e.g., the MLE may be \(\max_i X_i\). Always visualise the likelihood before differentiating.</p>
+  </div>
+</section>
+
+<!-- ───────────── §6 LIKELIHOOD & LOG-LIKELIHOOD ───────────── -->
+<section class="section" id="s6">
+  <span class="section-number">Section 06</span>
+  <h2>Likelihood and Log-Likelihood</h2>
+
+  <h3>Formal Definition</h3>
+
+  <div class="def-box">
+    <p class="box-label">Definition — Likelihood</p>
+    <p>For an i.i.d. sample from a model with PMF \(p_\theta\) (discrete) or density \(f_\theta\) (continuous):</p>
+    $$L_n(x_1,\ldots,x_n,\theta) = \prod_{i=1}^n p_\theta(x_i) \quad\text{or}\quad \prod_{i=1}^n f_\theta(x_i)$$
+    <p>The likelihood is the <em>joint distribution</em> of the data, viewed as a function of the parameter \(\theta\).</p>
+  </div>
+
+  <p>Because many distributions involve exponentials, the <strong>log-likelihood</strong> is far more convenient to work with:</p>
+
+  <div class="formula-block named">
+    <span class="formula-name">Log-Likelihood</span>
+    $$\ell_n(\theta) = \log L_n = \sum_{i=1}^n \log p_\theta(X_i) \quad\text{or}\quad \sum_{i=1}^n \log f_\theta(X_i)$$
+  </div>
+
+  <p>Since \(\log\) is strictly increasing, \(\arg\max_\theta L_n = \arg\max_\theta \ell_n\). The log-likelihood is always preferred for computation.</p>
+
+  <div class="def-box">
+    <p class="box-label">Definition — Maximum Likelihood Estimator</p>
+    $$\hat\theta_n^{\,\mathrm{MLE}} = \underset{\theta\in\Theta}{\arg\max}\; L_n(X_1,\ldots,X_n,\theta) = \underset{\theta\in\Theta}{\arg\max}\;\ell_n(\theta)$$
+    <p>The MLE is the parameter value making the observed data <em>most probable</em> (or most plausible for continuous data).</p>
+  </div>
+
+  <h3>Worked Examples of Likelihood Functions</h3>
+
+  <div class="example-block">
+    <div class="example-header">Example — Bernoulli(\(p\))</div>
+    <div class="example-body">
+      <p>Using the compact PMF \(p_p(x) = p^x(1-p)^{1-x}\):</p>
+      $$L_n(p) = \prod_{i=1}^n p^{x_i}(1-p)^{1-x_i} = p^{\sum x_i}(1-p)^{n-\sum x_i}$$
+    </div>
+  </div>
+
+  <div class="example-block">
+    <div class="example-header">Example — Poisson(\(\lambda\))</div>
+    <div class="example-body">
+      <p>Using \(p_\lambda(x) = e^{-\lambda}\lambda^x/x!\):</p>
+      $$L_n(\lambda) = e^{-n\lambda}\,\frac{\lambda^{\sum x_i}}{x_1!\cdots x_n!}$$
+      <p>The denominator is constant in \(\lambda\) and can be ignored when maximising.</p>
+    </div>
+  </div>
+
+  <div class="example-block">
+    <div class="example-header">Example — Gaussian(\(\mu,\sigma^2\))</div>
+    <div class="example-body">
+      $$L_n(\mu,\sigma^2) = \frac{1}{(\sigma\sqrt{2\pi})^n}\exp\!\left(-\frac{1}{2\sigma^2}\sum_{i=1}^n(x_i-\mu)^2\right)$$
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── §7 COMPUTING MLE ───────────── -->
+<section class="section" id="s7">
+  <span class="section-number">Section 07</span>
+  <h2>Computing the MLE — Worked Examples</h2>
+
+  <h3>Bernoulli Trials</h3>
+  <p>Take the log-likelihood:</p>
+  $$\ell(p) = \left(\sum_{i=1}^n x_i\right)\log p + \left(n - \sum_{i=1}^n x_i\right)\log(1-p)$$
+  <p>Set derivative to zero:</p>
+  $$\frac{d\ell}{dp} = \frac{\sum x_i}{p} - \frac{n - \sum x_i}{1-p} = 0$$
+  <p>Solving:</p>
+  <div class="formula-block">$$\hat p_n^{\,\mathrm{MLE}} = \frac{1}{n}\sum_{i=1}^n X_i = \bar X_n$$</div>
+
+  <h3>Poisson Model</h3>
+  <p>Log-likelihood (ignoring constants in \(\lambda\)):</p>
+  $$\ell(\lambda) = \left(\sum_{i=1}^n x_i\right)\log\lambda - n\lambda$$
+  <p>Set derivative to zero:</p>
+  $$\frac{d\ell}{d\lambda} = \frac{\sum x_i}{\lambda} - n = 0$$
+  <div class="formula-block">$$\hat\lambda_n^{\,\mathrm{MLE}} = \bar X_n$$</div>
+
+  <h3>Gaussian Model</h3>
+  <p>Taking the gradient of the Gaussian log-likelihood and setting it to zero yields:</p>
+  <div class="formula-block">$$\hat\mu_n^{\,\mathrm{MLE}} = \bar X_n, \qquad \hat\sigma^2_n{}^{\!\mathrm{MLE}} = \frac{1}{n}\sum_{i=1}^n(X_i - \bar X_n)^2 = \hat S_n$$</div>
+
+  <div class="insight-box">
+    <p class="box-label">✦ A Satisfying Pattern</p>
+    <p>For all three standard models, the MLE turns out to be the <strong>sample mean</strong> (or a function of it). The sophisticated machinery of KL divergence and optimization confirms our natural intuition about averaging.</p>
+  </div>
+</section>
+
+<!-- ───────────── §8 FISHER INFORMATION ───────────── -->
+<section class="section" id="s8">
+  <span class="section-number">Section 08</span>
+  <h2>Fisher Information</h2>
+
+  <p>The Fisher information quantifies the <em>curvature</em> of the log-likelihood at its maximum, controlling how sensitive the MLE is to fluctuations in the data.</p>
+
+  <div class="def-box">
+    <p class="box-label">Definition — Fisher Information (1D)</p>
+    <p>Let \(\ell(\theta) = \log f_\theta(X)\) be the log-likelihood for a single observation. The Fisher information is:</p>
+    $$I(\theta) = \mathrm{Var}_\theta[\ell'(\theta)] = -\mathbb{E}_\theta[\ell''(\theta)]$$
+    <p>where expectations are taken under \(\mathbb{P}_\theta\).</p>
+  </div>
+
+  <div class="def-box">
+    <p class="box-label">Definition — Fisher Information Matrix (multivariate)</p>
+    <p>When \(\theta\in\mathbb{R}^d\):</p>
+    $$I(\theta) = \mathbb{E}\!\left[\nabla\ell(\theta)\nabla\ell(\theta)^\top\right] - \mathbb{E}[\nabla\ell(\theta)]\,\mathbb{E}[\nabla\ell(\theta)]^\top = -\mathbb{E}[\nabla^2\ell(\theta)]$$
+  </div>
+
+  <h3>Three Equivalent Formulas (continuous case)</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Formula</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>\(\mathrm{Var}_\theta[\ell'(\theta)]\)</td><td>Often simplest</td></tr>
+        <tr><td>2</td><td>\(-\mathbb{E}_\theta[\ell''(\theta)]\)</td><td>Good when second derivative is clean</td></tr>
+        <tr><td>3</td><td>\(\displaystyle\int_E \frac{\left(\partial_\theta f_\theta(x)\right)^2}{f_\theta(x)}\,dx\)</td><td>Theoretical derivations</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Proof that \(\mathrm{Var}[\ell'] = -\mathbb{E}[\ell'']\)</h3>
+
+  <div class="proof">
+    <p>Key tools: (i) \(\int f_\theta(x)\,dx = 1\), so \(\frac{d}{d\theta}\int f_\theta(x)\,dx = 0\), which under regularity gives \(\int \partial_\theta f_\theta\,dx = 0\). Call this ★. Applying again: \(\int \partial^2_\theta f_\theta\,dx = 0\).</p>
+    <p>First, compute \(-\mathbb{E}[\ell'']\). Since \(\ell'' = \frac{f_\theta'' f_\theta - (f_\theta')^2}{f_\theta^2}\), multiplying through and integrating, the \(\int \partial^2_\theta f_\theta\,dx\) term vanishes by ★. We are left with \(\int\frac{(f'_\theta)^2}{f_\theta}dx\).</p>
+    <p>Second, compute \(\mathrm{Var}[\ell'] = \mathbb{E}[(\ell')^2] - (\mathbb{E}[\ell'])^2\). The second term equals \(\left(\int \partial_\theta f_\theta\,dx\right)^2 = 0\) by ★. The first term equals \(\int\frac{(f'_\theta)^2}{f_\theta}dx\).</p>
+    <p class="proof-end">Both expressions equal \(\int\frac{(\partial_\theta f_\theta)^2}{f_\theta}\,dx\), completing the proof.</p>
+  </div>
+
+  <h3>Curvature Interpretation</h3>
+  <p>Think of the log-likelihood \(\ell(\theta)\) as a hill centered at \(\theta^*\). The Fisher information measures how <em>sharply peaked</em> that hill is:</p>
+  <ul>
+    <li><strong>High \(I(\theta^*)\)</strong>: the log-likelihood has a sharp, narrow peak → the MLE is robust and precise.</li>
+    <li><strong>Low \(I(\theta^*)\)</strong>: the log-likelihood is nearly flat → the MLE is sensitive to data fluctuations and has high variance.</li>
+  </ul>
+</section>
+
+<!-- ───────────── §9 ASYMPTOTIC PROPERTIES ───────────── -->
+<section class="section" id="s9">
+  <span class="section-number">Section 09</span>
+  <h2>Asymptotic Properties of the MLE</h2>
+
+  <h3>Regularity Conditions</h3>
+  <ol>
+    <li>The model is <strong>identifiable</strong>: \(\theta \mapsto \mathbb{P}_\theta\) is injective.</li>
+    <li>The support of \(\mathbb{P}_\theta\) does not depend on \(\theta\).</li>
+    <li>The true parameter \(\theta^*\) is in the <strong>interior</strong> of \(\Theta\).</li>
+    <li>\(I(\theta)\) is invertible in a neighbourhood of \(\theta^*\).</li>
+    <li>Technical smoothness conditions (permuting integrals and derivatives).</li>
+  </ol>
+
+  <div class="theorem-box">
+    <p class="box-label">Theorem — Asymptotic Properties of the MLE</p>
+    <p>Under the above conditions:</p>
+    <p><strong>(i) Consistency:</strong></p>
+    $$\hat\theta_n^{\,\mathrm{MLE}} \xrightarrow{\mathbb{P}} \theta^* \quad\text{as } n\to\infty$$
+    <p><strong>(ii) Asymptotic Normality:</strong></p>
+    $$\sqrt{n}\!\left(\hat\theta_n^{\,\mathrm{MLE}} - \theta^*\right) \xrightarrow{(d)} \mathcal{N}\!\left(0,\, I(\theta^*)^{-1}\right) \quad\text{w.r.t. } \mathbb{P}_{\theta^*}$$
+  </div>
+
+  <div class="insight-box">
+    <p class="box-label">✦ What This Tells Us</p>
+    <p>Even when the MLE has no closed form, it behaves like a sample mean asymptotically. The asymptotic variance \(I(\theta^*)^{-1}\) is determined entirely by the Fisher information — no explicit computation of \(\mathrm{Var}[\hat\theta]\) needed.</p>
+  </div>
+
+  <h3>Asymptotic Quadratic Risk</h3>
+  <p>By the asymptotic normality result, the bias vanishes and the variance scales as \(1/n\):</p>
+  <div class="formula-block">
+    $$\mathbb{E}_{\theta^*}\!\left[(\hat\theta_n^{\,\mathrm{MLE}} - \theta^*)^2\right] \approx \frac{1}{n\cdot I(\theta^*)}$$
+  </div>
+  <p>A larger Fisher information means a smaller quadratic risk and a more efficient estimator.</p>
+</section>
+
+<!-- ───────────── §10 METHOD OF MOMENTS ───────────── -->
+<section class="section" id="s10">
+  <span class="section-number">Section 10</span>
+  <h2>Method of Moments</h2>
+
+  <h3>Motivation via the Weierstrass Approximation Theorem</h3>
+  <p>Any continuous bounded function on \([a,b]\) can be uniformly approximated by polynomials. In statistics, testing whether two distributions agree is equivalent to testing their integrals against all bounded continuous functions — and by Weierstrass, polynomials suffice. This reduces to matching <strong>moments</strong>.</p>
+
+  <div class="def-box">
+    <p class="box-label">Definition — Population and Empirical Moments</p>
+    <p>The <strong>\(k\)-th population moment</strong> is \(m_k(\theta) = \mathbb{E}_\theta[X^k]\).</p>
+    <p>The <strong>\(k\)-th empirical moment</strong> is \(\hat m_k = \tfrac{1}{n}\sum_{i=1}^n X_i^k\).</p>
+    <p>By the Law of Large Numbers, \(\hat m_k \xrightarrow{\mathbb{P}} m_k(\theta^*)\).</p>
+  </div>
+
+  <h3>The Vandermonde Invertibility Result</h3>
+  <p>For a discrete distribution with \(r\) possible values, the PMF is fully described by \(r-1\) free parameters. The first \(r-1\) moments are sufficient to recover the PMF, since the moment-to-PMF mapping is a linear system with a <strong>Vandermonde</strong> coefficient matrix:</p>
+  <div class="formula-block">
+    $$\det(V) = \prod_{1\le j < k \le r}(x_k - x_j) \ne 0$$
+  </div>
+  <p>Since the values \(x_1,\ldots,x_r\) are distinct, the determinant is nonzero and the matrix is invertible. Therefore moments and the PMF carry exactly the same information.</p>
+
+  <h3>Method of Moments Estimator</h3>
+
+  <p>Suppose \(\psi:\Theta\subset\mathbb{R}^d \to \mathbb{R}^d\) maps parameters to the first \(d\) moments, and \(\psi\) is invertible. Then:</p>
+
+  <div class="formula-block named">
+    <span class="formula-name">MoM Estimator</span>
+    $$\hat\theta_n^{\,\mathrm{MoM}} = \psi^{-1}(\hat m_1, \ldots, \hat m_d)$$
+  </div>
+
+  <p>The rule of thumb: if \(\theta\in\mathbb{R}^d\), match \(d\) moments.</p>
+
+  <h3>Asymptotic Properties</h3>
+  <p>By the multivariate CLT and the delta method:</p>
+  <ol>
+    <li><strong>Consistency:</strong> \(\hat\theta_n^{\,\mathrm{MoM}} \xrightarrow{\mathbb{P}} \theta^*\) (from LLN + continuous mapping theorem).</li>
+    <li><strong>Asymptotic normality:</strong> \(\sqrt{n}(\hat\theta_n^{\,\mathrm{MoM}} - \theta^*) \xrightarrow{d} \mathcal{N}(0,\Sigma)\) where:
+      $$\Sigma = \nabla\psi^{-1}(M(\theta^*))\cdot\Sigma_\theta\cdot\bigl[\nabla\psi^{-1}(M(\theta^*))\bigr]^\top$$
+      and \(\Sigma_\theta\) is the covariance matrix of the vector \((X, X^2, \ldots, X^d)\).</li>
+  </ol>
+  <p>The gradient \(\nabla\psi^{-1}\) plays the same role as \(I^{-1}\) for MLE: a steep \(\psi^{-1}\) amplifies estimation error.</p>
+
+  <h3>MLE vs. Method of Moments</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Criterion</th><th>MLE</th><th>Method of Moments</th></tr></thead>
+      <tbody>
+        <tr><td>Statistical efficiency</td><td>Higher (asymptotically optimal)</td><td>Often lower</td></tr>
+        <tr><td>Computational tractability</td><td>Requires concave likelihood</td><td>Always tractable (solve equations)</td></tr>
+        <tr><td>Use with non-concave likelihoods</td><td>Only local heuristics</td><td>Good initialiser for local algorithms</td></tr>
+        <tr><td>Asymptotic variance</td><td>\(I(\theta^*)^{-1}/n\)</td><td>Depends on \(\nabla\psi^{-1}\) and \(\Sigma_\theta\)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box">
+    <p class="box-label">✦ Practical Strategy</p>
+    <p>When the likelihood is non-concave, use the Method of Moments to obtain a <strong>good starting point</strong>, then run a local optimisation algorithm (gradient ascent, Newton–Raphson) from that point. MoM lands you in the right "basin of attraction"; MLE then refines the estimate.</p>
+  </div>
+</section>
+
+</main>
+
+</body>
+</html>
