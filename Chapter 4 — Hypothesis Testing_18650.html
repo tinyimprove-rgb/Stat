@@ -3,704 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Parametric Hypothesis Testing — MIT Study Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<title>Chapter 2 — Maximum Likelihood Estimation</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams'
+  },
+  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #fefcf8;
-  --text: #1e1b16;
-  --text-light: #5b5546;
-  --border: #e2dcd0;
-  --accent-gold: #b16e2c;
-  --accent-gold-light: #e7cfaa;
-  --accent-teal: #2c6e6b;
-  --accent-teal-light: #deedea;
-  --accent-sage: #5e6f4c;
-  --accent-sage-light: #edf1e4;
-  --accent-clay: #b24c2e;
-  --accent-clay-light: #f9eae4;
-  --code-bg: #2a2824;
-  --code-text: #e6e2db;
-  --card-bg: #ffffff;
+:root{
+  --navy:#0d1b2a; --navy2:#1b2e44; --blue:#1558a8; --bluel:#e8f1fb;
+  --gold:#b8861e; --goldl:#fdf3e0; --green:#2a6045; --greenl:#e9f5ee;
+  --red:#7d1f1f; --redl:#fdecea; --purple:#453080; --purplel:#eeebfa;
+  --teal:#0e6b6b; --teall:#e4f5f5; --bg:#ffffff; --bg2:#f1ece2; 
+  --rule:#ccc4b2; --text:#000000; --text2:#54504a;
+  --serif:'Source Serif 4',Georgia,serif;
+  --display:'Playfair Display',Georgia,serif;
+  --mono:'JetBrains Mono',monospace;
 }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--serif);font-size:18px;line-height:1.92;}
+.wrap{max-width:940px;margin:0 auto;padding:0 2.2rem 8rem;}
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* HEADER */
+.hdr{background:var(--navy);color:#fff;padding:5rem 3.5rem 4rem;margin-bottom:4rem;position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;top:-70px;right:-70px;width:360px;height:360px;border:1.5px solid rgba(184,134,30,.2);border-radius:50%;}
+.hdr::after{content:'';position:absolute;bottom:-90px;left:-50px;width:260px;height:260px;border:1.5px solid rgba(184,134,30,.12);border-radius:50%;}
+.hdr-tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:.9rem;}
+.hdr-bg-num{font-family:var(--display);font-size:9rem;color:rgba(255,255,255,.04);position:absolute;top:1.5rem;right:3rem;line-height:1;user-select:none;}
+.hdr-title{font-family:var(--display);font-size:2.85rem;line-height:1.22;margin-bottom:.5rem;position:relative;z-index:1;}
+.hdr-sub{font-size:1rem;color:rgba(255,255,255,.6);font-style:italic;margin-bottom:2.4rem;}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  line-height: 1.65;
-  font-weight: 400;
-}
+.obj{background:rgba(255,255,255,.06);border:1px solid rgba(184,134,30,.35);border-radius:6px;padding:1.4rem 1.9rem;position:relative;z-index:1;}
+.obj h3{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;color:var(--gold);margin-bottom:.85rem;text-transform:uppercase;}
+.obj ul{list-style:none;}
+.obj li{color:rgba(255,255,255,.85);font-size:.96rem;padding:.22rem 0 .22rem 1.4rem;position:relative;}
+.obj li::before{content:'◆';position:absolute;left:0;top:.54rem;font-size:.52rem;color:var(--gold);}
 
-/* Typography */
-h1, h2, h3, h4 {
-  font-family: 'Source Serif 4', serif;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
+/* TOC */
+.toc{background:var(--bg2);border:1px solid var(--rule);border-radius:8px;padding:2rem 2.5rem;margin-bottom:4rem;}
+.toc h3{font-family:var(--display);font-size:1.08rem;color:var(--navy);margin-bottom:.9rem;padding-bottom:.55rem;border-bottom:1px solid var(--rule);}
+.toc ol{padding-left:1.3rem;}
+.toc > ol > li{margin:.45rem 0;font-size:.97rem;font-weight:600;color:var(--navy);}
+.toc ol ol{padding-left:1.4rem;margin:.2rem 0 .3rem;list-style:lower-alpha;}
+.toc ol ol li{font-size:.9rem;font-weight:400;color:var(--text2);margin:.18rem 0;}
+.toc a{color:var(--blue);text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
 
-header h1 {
-  font-size: 2.8rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
+/* CONTENT TYPOGRAPHY */
+.section{margin-bottom:5.5rem;}
+h1.sec{font-family:var(--display);font-size:2rem;color:var(--navy);border-bottom:3px solid var(--blue);padding-bottom:.4rem;margin-bottom:1.8rem;display:flex;align-items:baseline;gap:.75rem;}
+h1.sec .n{font-family:var(--mono);font-size:.88rem;color:var(--blue);background:rgba(21,88,168,.1);padding:.1rem .48rem;border-radius:4px;}
+h2.sub{font-family:var(--display);font-size:1.44rem;color:var(--navy2);margin:2.6rem 0 .95rem;padding-left:1rem;border-left:4px solid var(--gold);}
+p{margin-bottom:1.1rem;}
 
-h2 {
-  font-size: 1.7rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
+/* SPECIAL BOXES */
+.box{border-radius:7px;padding:1.5rem 1.9rem;margin:1.75rem 0;}
+.bt{font-family:var(--mono);font-size:.69rem;letter-spacing:.14em;font-weight:500;margin-bottom:.72rem;text-transform:uppercase;}
+.def{background:var(--bluel);border:1px solid #b2cce8;border-left:5px solid var(--blue);}
+.def .bt{color:var(--blue);}
+.thm{background:var(--goldl);border:1px solid #dac572;border-left:5px solid var(--gold);}
+.thm .bt{color:#7a5800;}
+.eg{background:var(--greenl);border:1px solid #9ecdb0;border-left:5px solid var(--green);}
+.eg .bt{color:var(--green);}
+.int{background:var(--purplel);border:1px solid #b8b0e0;border-left:5px solid var(--purple);}
+.int .bt{color:var(--purple);}
 
-h3 {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: var(--accent-teal);
-  margin-top: 1.8rem;
-  margin-bottom: 0.6rem;
-}
+/* FORMULA BOX */
+.fbox{background:var(--navy);color:#d8e8ff;border-radius:8px;padding:1.7rem 2rem;margin:1.7rem 0;overflow-x:auto;position:relative;text-align:center;}
+.fbox .fl{position:absolute;top:.55rem;right:.9rem;font-family:var(--mono);font-size:.66rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;}
 
-h4 {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent-gold);
-  margin: 1.2rem 0 0.4rem;
-}
+/* CALLOUT STRIP */
+.strip{border-radius:6px;padding:1rem 1.5rem;margin:1.4rem 0;font-size:.95rem;display:flex;gap:.9rem;align-items:flex-start;}
+.strip .icon{font-size:1.3rem;flex-shrink:0;margin-top:.05rem;}
+.strip-gold{background:#fdf0d5;border:1px solid #e0c070;}
 
-/* Layout */
-header {
-  background: var(--text);
-  color: var(--bg);
-  padding: 3.5rem 2rem;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-}
-
-.badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  background: rgba(255,255,240,0.1);
-  display: inline-block;
-  padding: 0.25rem 0.9rem;
-  border-radius: 30px;
-  margin-bottom: 1.2rem;
-  color: var(--accent-gold-light);
-}
-
-header h1 em {
-  font-style: italic;
-  color: var(--accent-gold-light);
-}
-
-.subtitle {
-  font-size: 0.9rem;
-  opacity: 0.65;
-  font-weight: 300;
-  max-width: 600px;
-  margin: 0.8rem auto 0;
-}
-
-.toc-wrap {
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border);
-  padding: 1.2rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  backdrop-filter: blur(8px);
-  background: rgba(254,252,248,0.92);
-}
-
-.toc-inner {
-  max-width: 960px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem 1.2rem;
-  align-items: baseline;
-}
-
-.toc-inner strong {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  color: var(--accent-gold);
-  margin-right: 0.2rem;
-}
-
-.toc-inner a {
-  font-size: 0.75rem;
-  color: var(--text-light);
-  text-decoration: none;
-  border-bottom: 1px dotted transparent;
-  transition: 0.2s;
-}
-
-.toc-inner a:hover {
-  color: var(--accent-gold);
-  border-bottom-color: var(--accent-gold);
-}
-
-main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2.5rem 2rem 5rem;
-}
-
-section {
-  margin-bottom: 3.5rem;
-  scroll-margin-top: 5rem;
-}
-
-.section-header {
-  display: flex;
-  align-items: baseline;
-  gap: 0.8rem;
-  border-bottom: 2px solid var(--border);
-  padding-bottom: 0.5rem;
-  margin-bottom: 1.8rem;
-}
-
-.section-number {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--accent-gold);
-  background: var(--accent-gold-light);
-  padding: 0.2rem 0.6rem;
-  border-radius: 20px;
-  letter-spacing: 0.02em;
-}
-
-/* Boxes */
-.box {
-  border-radius: 12px;
-  padding: 1.2rem 1.6rem;
-  margin: 1.6rem 0;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-}
-
-.box-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 500;
-  margin-bottom: 0.6rem;
-  color: var(--accent-gold);
-}
-
-.box-content {
-  font-size: 0.95rem;
-}
-
-.box-insight {
-  border-left: 5px solid var(--accent-gold);
-  background: #fffaf2;
-}
-
-.box-definition {
-  border-left: 5px solid var(--accent-teal);
-  background: var(--accent-teal-light);
-}
-.box-definition .box-label { color: var(--accent-teal); }
-
-.box-warning {
-  border-left: 5px solid var(--accent-clay);
-  background: var(--accent-clay-light);
-}
-.box-warning .box-label { color: var(--accent-clay); }
-
-.box-example {
-  background: var(--accent-sage-light);
-  border-left: 5px solid var(--accent-sage);
-}
-.box-example .box-label { color: var(--accent-sage); }
-
-.formula-block {
-  background: var(--code-bg);
-  color: var(--code-text);
-  border-radius: 12px;
-  padding: 1rem 1.6rem;
-  margin: 1.5rem 0;
-  overflow-x: auto;
-  text-align: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
-}
-
-.formula-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent-gold-light);
-  margin-bottom: 0.4rem;
-  text-align: left;
-}
-
-.table-wrap {
-  overflow-x: auto;
-  margin: 1.4rem 0;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-}
-
-thead tr {
-  background: var(--text);
-  color: var(--bg);
-}
-
-thead th {
-  padding: 0.7rem 1rem;
-  text-align: left;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-
-tbody tr:nth-child(even) {
-  background: #f6f3ed;
-}
-
-td {
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-}
-
-.matrix-grid {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 1px;
-  margin: 1.4rem 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  font-size: 0.85rem;
-  text-align: center;
-  background: var(--border);
-}
-
-.hcell {
-  background: var(--text);
-  color: var(--bg);
-  padding: 0.6rem 0.5rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  font-weight: 500;
-}
-
-.correct { background: #e6f0e8; padding: 0.8rem 0.5rem; color: var(--accent-sage); font-weight: 500; }
-.err1 { background: #fcece6; padding: 0.8rem 0.5rem; color: var(--accent-clay); font-weight: 500; }
-.err2 { background: #feefdf; padding: 0.8rem 0.5rem; color: #a2632c; font-weight: 500; }
-
-ol.steps {
-  padding-left: 0;
-  list-style: none;
-  counter-reset: step;
-  margin: 1.2rem 0;
-}
-
-ol.steps li {
-  counter-increment: step;
-  display: flex;
-  gap: 0.8rem;
-  margin-bottom: 0.8rem;
-  font-size: 0.94rem;
-}
-
-ol.steps li::before {
-  content: counter(step);
-  min-width: 26px;
-  height: 26px;
-  background: var(--accent-teal);
-  color: white;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 30px;
-  flex-shrink: 0;
-  margin-top: 0.1rem;
-}
-
-ul.clean {
-  margin: 0.5rem 0 1rem 1.2rem;
-  font-size: 0.94rem;
-}
-ul.clean li {
-  margin-bottom: 0.35rem;
-}
-
-.glossary {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-
-.glossary-item {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem 1.2rem;
-  transition: 0.1s ease;
-}
-
-.gterm {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent-gold);
-  margin-bottom: 0.3rem;
-}
-
-.glossary-item p {
-  font-size: 0.85rem;
-  color: var(--text-light);
-  margin: 0;
-  line-height: 1.45;
-}
-
-.diagram-wrap {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.2rem;
-  margin: 1.5rem 0;
-  text-align: center;
-}
-
-.dist-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 1.2rem 0;
-}
-
-.dist-card {
-  flex: 1;
-  min-width: 180px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem;
-}
-
-.dist-name {
-  font-family: 'Source Serif 4', serif;
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 0.2rem;
-}
-
-.dist-param {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--accent-gold);
-  margin-bottom: 0.3rem;
-}
-
-footer {
-  text-align: center;
-  padding: 2rem;
-  font-size: 0.7rem;
-  color: var(--text-light);
-  border-top: 1px solid var(--border);
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.02em;
-}
-
-@media (max-width: 680px) {
-  main { padding: 1.5rem 1.2rem; }
-  h2 { font-size: 1.4rem; }
-  .toc-wrap { padding: 0.8rem 1rem; }
-  header h1 { font-size: 2rem; }
-}
+mjx-container[display="true"]{margin:.78em 0 !important;}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="badge">MIT OpenCourseWare · Inferential Statistics</div>
-  <h1>Parametric <em>Hypothesis Testing</em></h1>
-  <p class="subtitle">Complete lecture notes — three full lectures · all examples, derivations, intuitions, and edge cases included</p>
-</header>
-
-<div class="toc-wrap">
-  <div class="toc-inner">
-    <strong>Contents</strong>
-    <a href="#s1">1. Why Tests?</a>
-    <a href="#s2">2. Cherry Blossom Run</a>
-    <a href="#s3">3. Drug Trial</a>
-    <a href="#s4">4. Modeling Assumptions</a>
-    <a href="#s5">5. Formulating Hypotheses</a>
-    <a href="#s6">6. Space of Distributions</a>
-    <a href="#s7">7. Defining a Test</a>
-    <a href="#s8">8. Type I &amp; II Errors</a>
-    <a href="#s9">9. Power &amp; Level</a>
-    <a href="#s10">10. Coin Flip Example</a>
-    <a href="#s11">11. Test Statistic &amp; Threshold</a>
-    <a href="#s12">12. The p-Value</a>
-    <a href="#s13">13. p-Hacking</a>
-    <a href="#s14">14. Neyman–Pearson</a>
-    <a href="#s15">15. Chi-Squared Distribution</a>
-    <a href="#s16">16. Student's t</a>
-    <a href="#s17">17. Wald's Test</a>
-    <a href="#s18">18. Likelihood Ratio Test</a>
-    <a href="#s19">19. Delta Method Tests</a>
-    <a href="#s20">20. Multinomial Chi-Squared Test</a>
-    <a href="#glossary">Glossary</a>
-  </div>
-</div>
-
-<main>
-
-<!-- §1 -->
-<section id="s1">
-  <div class="section-header"><span class="section-number">§ 01</span><h2>Why Hypothesis Testing? Estimation vs. Testing</h2></div>
-
-  <p>Up to this point the course focused on <strong>estimation</strong>: deriving the best numerical guess for an unknown parameter \(\theta\). Maximum likelihood estimation was the central tool. In many cases — particularly for Gaussian models — the MLE turned out simply to be the sample average. Even when we already knew the answer intuitively, going through MLE confirmed the intuition and gave us tools to analyse the estimator's quality using the Central Limit Theorem.</p>
-
-  <p>Now we introduce a fundamentally different kind of question. Instead of asking <em>"what is \(\mu\)?"</em> we ask a yes/no question: <em>"Is \(\mu\) equal to some reference value, or has it changed?"</em> This is <span class="kterm">parametric hypothesis testing</span> — "parametric" because the claim is about a parameter of a known distributional family.</p>
-
-  <div class="box box-insight">
-    <div class="box-label">Key Shift in Perspective</div>
-    <div class="box-content">
-      In estimation, randomness (via the CLT) appeared only in the <em>analysis</em> of the estimator after it was designed. In testing, randomness enters both the <strong>design</strong> and the <strong>analysis</strong>. We must account for random fluctuations in order to build the test itself — not just to understand it afterwards. The CLT is no longer just a quality certificate; it is part of the test construction.
-    </div>
-  </div>
-
-  <p>Hypothesis testing is the foundation of essentially all <strong>data-driven scientific inquiry</strong>. Any time you formulate a scientific claim and try to confirm or deny it with data, you are implicitly doing a hypothesis test:</p>
-  <ul class="clean">
-    <li>"Knocking down this gene cures melanoma." → collect patient outcomes → yes/no answer.</li>
-    <li>"This drug reduces coughing." → clinical trial → yes/no answer.</li>
-    <li>"Runners were faster this year." → sample race times → yes/no answer.</li>
-  </ul>
-
-  <p>Everyone has heard of hypothesis testing; here we make it precise. The three goals of statistical inference are: <strong>estimation</strong> (produces an approximate value), <strong>confidence intervals</strong> (find a range), and <strong>hypothesis tests</strong> (answer a yes/no question — for example, "is it true that \(\theta_1\) and \(\theta_2\) are significantly different?"). This chapter focuses on the last.</p>
-</section>
-
-<!-- §2 -->
-<section id="s2">
-  <div class="section-header"><span class="section-number">§ 02</span><h2>Motivating Example — The Cherry Blossom Run</h2></div>
-
-  <p>The <strong>Credit Union Cherry Blossom Run</strong> is a 10-mile race held annually in Washington D.C. The 2009 and 2012 datasets are both publicly available in R.</p>
-
-  <div class="box box-example">
-    <div class="box-label">Known Data from 2009 (Full Population, N ≈ 15,000)</div>
-    <div class="box-content">
-      <ul class="clean">
-        <li>Mean running time: \(\mu_{2009} = 103.5\) minutes</li>
-        <li>Variance: \(\sigma^2_{2009} = 373\)</li>
-        <li>Distribution: histogram of all 15,000 times closely matches a Gaussian bell curve</li>
+<div class="hdr">
+  <div class="wrap" style="padding-top:0;padding-bottom:0;">
+    <div class="hdr-bg-num">2</div>
+    <div class="hdr-tag">Chapter 02 &nbsp;·&nbsp; Statistical Inference</div>
+    <h1 class="hdr-title">Maximum Likelihood<br>Estimation</h1>
+    <p class="hdr-sub">From the likelihood function to large-sample theory — the most powerful and widely used framework for parameter estimation</p>
+    <div class="obj">
+      <h3>Learning Objectives</h3>
+      <ul>
+        <li>Construct the likelihood function for any parametric model and interpret it geometrically</li>
+        <li>Derive the MLE analytically via the score equation and numerically via optimization</li>
+        <li>Contrast MLE with the Method of Moments — when they agree and when they differ</li>
+        <li>Understand the bias–variance tradeoff and efficiency for estimators</li>
+        <li>State and apply the large-sample theory of MLE: asymptotic normality and Fisher information</li>
       </ul>
     </div>
   </div>
+</div>
 
-  <h3>The Problem</h3>
-  <p>Suppose our budget allows surveying only \(n = 10\) runners from the 2012 race. We want to know: <em>were runners faster in 2012 than in 2009?</em> How can we make a valid statistical claim from just 10 observations?</p>
+<div class="wrap">
 
-  <h3>Where Randomness Comes From</h3>
-  <p>We select \(n\) runners <em>uniformly at random</em>. Each runner is an elementary outcome \(\omega\) in the probability space — the runners <em>are</em> the omegas. The random variable of interest is their running time. This is how we inject randomness: not from the measurement itself, but from the random selection of who we observe.</p>
-
-  <p>From a given runner, many variables could be measured: country of origin, age, height. Here we care only about running time: \(X_i = \text{running time of runner } i\).</p>
-
-  <h3>Why the Gaussian Assumption Is Justified</h3>
-  <p>The 2009 histogram is well-approximated by a Gaussian. This is expected: running time is the cumulative result of many small independent factors (physiological, environmental, psychological) — exactly the CLT setting. Bell-shaped distributions arise everywhere in nature for this reason. We therefore assume \(X_i \sim \mathcal{N}(\mu, \sigma^2)\) for the 2012 data, with \(\sigma^2 = 373\) fixed (same as 2009) and \(\mu\) unknown.</p>
-
-  <div class="box box-warning">
-    <div class="box-label">Caveat on the Variance Assumption</div>
-    <div class="box-content">
-      Fixing \(\sigma^2_{2012} = 373\) is acknowledged to be incorrect — the actual 2012 data has a different variance. This assumption is made for simplicity of exposition. The Gaussian shape assumption, by contrast, is quite robust: the CLT guarantees it arises whenever you aggregate many small independent effects, and this is hard to violate across years for the same race.
-    </div>
-  </div>
-
-  <h3>The Statistical Question</h3>
-  <div class="formula-block">
-    <div class="formula-label">Cherry Blossom Hypothesis</div>
-    \[H_0: \mu = 103.5 \quad \text{vs.} \quad H_1: \mu < 103.5\]
-  </div>
-  <p>We use a one-sided alternative because we ask specifically whether runners were <em>faster</em> (smaller time), not just different. This concentration of the alternative on one side increases statistical power.</p>
-</section>
-
-<!-- §3 -->
-<section id="s3">
-  <div class="section-header"><span class="section-number">§ 03</span><h2>Two-Sample Test — Clinical Drug Trial</h2></div>
-
-  <p>This is the more realistic scenario: <strong>no fixed reference value exists</strong>. Pharmaceutical companies face this problem daily. The FDA requires rigorously controlled trials before approving any drug.</p>
-
-  <h3>Setup</h3>
-  <p>A new cough syrup is tested against a placebo. Patients are randomly split:</p>
-  <ul class="clean">
-    <li><strong>Control group</strong> (\(n_{\text{ctrl}}\) patients): receives maple syrup (placebo). Expected coughs/hour: \(\mu_{\text{ctrl}}\).</li>
-    <li><strong>Drug group</strong> (\(n_{\text{drug}}\) patients): receives the real drug. Expected coughs/hour: \(\mu_{\text{drug}}\).</li>
-  </ul>
-  <p>Note that maple syrup itself has a soothing effect on coughing — it is sweet and helps slightly. The placebo effect is real but unknown. We cannot simply compare against zero; we must measure the placebo effect too.</p>
-
-  <div class="box box-example">
-    <div class="box-label">Modeling Assumption</div>
-    <div class="box-content">
-      Cough counts are modeled as Poisson(\(\mu\)): non-negative integers, fully characterised by their mean. This is natural for count data. So there is one unknown parameter per group.
-    </div>
-  </div>
-
-  <div class="formula-block">
-    <div class="formula-label">Drug Trial Hypotheses</div>
-    \[H_0: \mu_{\text{drug}} = \mu_{\text{ctrl}} \quad \text{vs.} \quad H_1: \mu_{\text{drug}} < \mu_{\text{ctrl}}\]
-  </div>
-
-  <h3>Two Sources of Randomness</h3>
-  <p>Unlike the Cherry Blossom case (one unknown vs. a known reference), here <em>both</em> means are estimated:</p>
-  <ul class="clean">
-    <li>\(\bar{X}^{\text{drug}}\) estimates \(\mu_{\text{drug}}\) with fluctuation scale \(1/\sqrt{n_{\text{drug}}}\)</li>
-    <li>\(\bar{X}^{\text{ctrl}}\) estimates \(\mu_{\text{ctrl}}\) with fluctuation scale \(1/\sqrt{n_{\text{ctrl}}}\)</li>
-  </ul>
-  <p>Any buffer in the test must account for both sources. The difference \(\bar{X}^{\text{drug}} - \bar{X}^{\text{ctrl}}\) is approximately \(\mathcal{N}(\mu_{\text{drug}} - \mu_{\text{ctrl}}, \sigma^2_{\text{combined}})\) and under \(H_0\) is centred at zero.</p>
-
-  <h3>Why We Make It Hard to Conclude the Drug Works</h3>
-  <p>If \(\mu_{\text{drug}} = \mu_{\text{ctrl}}\) (the drug is just corn syrup), the difference \(\bar{X}^{\text{drug}} - \bar{X}^{\text{ctrl}} \sim \mathcal{N}(0, \sigma^2)\). Without any buffer, this quantity is negative 50% of the time, meaning a naive test would approve 50% of all completely ineffective drugs. We demand the difference be substantially more negative than random chance could explain — far into the left tail of the null distribution.</p>
-
-  <h3>Unequal Group Sizes</h3>
-  <p>The two groups need not be the same size. This arises because:</p>
-  <ul class="clean">
-    <li>Patient eligibility and dropouts are unpredictable</li>
-    <li>Ethical pressure: desperate patients prefer the real drug over placebo</li>
-    <li>Variance optimisation: if one group has higher variance, you want more subjects there</li>
-  </ul>
-  <p>This is studied formally in the field of <span class="kterm">Design of Experiments</span>.</p>
-</section>
-
-<!-- §4 -->
-<section id="s4">
-  <div class="section-header"><span class="section-number">§ 04</span><h2>The Role of Modeling Assumptions</h2></div>
-
-  <p>Modeling assumptions are not just conveniences — they are essential for hypothesis testing to work.</p>
-
-  <h3>Why Restricting the Distribution Space Is Necessary</h3>
-  <p>Consider the universe of all possible probability distributions. Without constraints, data will always find some distribution that fits better than any specific null. For example:</p>
-
-  <div class="box box-example">
-    <div class="box-label">Why Overfitting Destroys Testing</div>
-    <div class="box-content">
-      Suppose you collect 10 running times: \(\{91, 95, 102, \ldots\}\). The most likely distribution over <em>all</em> possible distributions is the discrete one placing mass \(1/10\) on each observed value. This fits perfectly. You would always reject any Gaussian null — not because the data is non-Gaussian, but because you are searching across an enormous space. Any finite sample fits some exotic distribution perfectly by chance.
-    </div>
-  </div>
-
-  <h3>How Assumptions Sequentially Reduce the Problem</h3>
-  <p>For the Cherry Blossom test, each assumption removes a dimension of uncertainty:</p>
-  <ol class="steps">
-    <li><strong>Assume Gaussian:</strong> eliminates all non-Gaussian families (exponential, Poisson, discrete, etc.).</li>
-    <li><strong>Fix \(\sigma^2 = 373\):</strong> reduces to a one-parameter family indexed by \(\mu\) alone.</li>
-    <li><strong>One-sided alternative \(\mu &lt; 103.5\):</strong> removes the possibility \(\mu > 103.5\) from consideration, focusing all power on detecting improvements.</li>
+<div class="toc">
+  <h3>Contents</h3>
+  <ol>
+    <li><a href="#s1">2.1 &nbsp; Point Estimation — The Setup</a>
+      <ol>
+        <li><a href="#s1a">What is a point estimator?</a></li>
+        <li><a href="#s1b">Method of Moments</a></li>
+        <li><a href="#s1c">Introducing Maximum Likelihood</a></li>
+      </ol>
+    </li>
+    <li><a href="#s2">2.2 &nbsp; The Likelihood Function</a>
+      <ol>
+        <li><a href="#s2a">Definition and construction</a></li>
+        <li><a href="#s2b">The log-likelihood and score equation</a></li>
+      </ol>
+    </li>
   </ol>
+</div>
 
-  <div class="box box-insight">
-    <div class="box-label">The Fundamental Trade-off in Assumptions</div>
-    <div class="box-content">
-      More assumptions → more focused, more powerful test, but conclusions are more sensitive to those assumptions being correct. Fewer assumptions → more robust, but lower power. Good statistical practice means making the minimum set of defensible assumptions required to answer the specific question.
-    </div>
-  </div>
-</section>
-
-<!-- §5 -->
-<section id="s5">
-  <div class="section-header"><span class="section-number">§ 05</span><h2>Formal Hypothesis Formulation</h2></div>
-
-  <p>Let \(X_1, \ldots, X_n \overset{iid}{\sim} P_\theta\) where \(\theta \in \Theta\). Let \(\Theta_0\) and \(\Theta_1\) be two disjoint subsets of \(\Theta\). Consider the two hypotheses:</p>
-  <div class="formula-block">
-    <div class="formula-label">Hypothesis Testing Problem</div>
-    \[H_0 : \theta \in \Theta_0 \quad \text{(null hypothesis)}\]
-    \[H_1 : \theta \in \Theta_1 \quad \text{(alternative hypothesis)}\]
-    \[\Theta_0 \cap \Theta_1 = \emptyset, \quad \Theta_0, \Theta_1 \subseteq \Theta\]
-  </div>
-  <p>We will always either be able to invalidate \(H_0\) (reject it), or conclude that we cannot invalidate it. We never "accept \(H_0\)" — the only options are to reject or fail to reject. In this class, we do not care about \(H_1\) directly: we focus entirely on controlling what happens under \(H_0\).</p>
-
-  <p>Note that \(\Theta_0 \cup \Theta_1\) need not equal all of \(\Theta\) — there can be parameter values neither hypothesis covers (e.g., \(\mu > 103.5\) in the Cherry Blossom example).</p>
-
-  <div class="box box-example">
-    <div class="box-label">Example 16.1 — Fair Coin</div>
-    <div class="box-content">
-      Suppose \(X_1, \ldots, X_n \overset{iid}{\sim} \text{Bernoulli}(p)\). We would like to test if \(p = 1/2\). The hypotheses are:
-      \[H_0: p = 1/2 \qquad H_1: p \ne 1/2\]
-      and the parameter sets are:
-      \[\Theta_0 = \{1/2\} \qquad \Theta_1 = (0,1) \setminus \{1/2\}\]
-    </div>
+<div class="section" id="s1">
+  <h1 class="sec"><span class="n">2.1</span> Point Estimation — The Setup</h1>
+  <p>In Chapter 1 we established the basic problem: we observe a sample $X_1, \ldots, X_n \overset{\text{i.i.d.}}{\sim} F_\theta$ where the parameter $\theta$ is unknown. Now we face the question: <em>how do we produce a specific numerical guess for $\theta$?</em></p>
+  
+  <h2 class="sub" id="s1a">2.1.1 What Is a Point Estimator?</h2>
+  <div class="box def">
+    <div class="bt">Definition · Point Estimator</div>
+    <p>A <strong>point estimator</strong> $\hat{\theta}_n$ of a parameter $\theta$ is any function $\hat{\theta}_n = T(X_1, \ldots, X_n)$ of the sample. It is a <em>random variable</em>. We measure how good an estimator is via its <strong>mean squared error</strong>:</p>
+    $$\text{MSE}(\hat{\theta}_n) = \underbrace{\bigl(\mathbb{E}[\hat{\theta}_n] - \theta\bigr)^2}_{\text{bias}^2} + \underbrace{\text{Var}(\hat{\theta}_n)}_{\text{variance}}$$
   </div>
 
-  <div class="box box-example">
-    <div class="box-label">Example — One-Sided Coin (Adversarial Setting)</div>
-    <div class="box-content">
-      Now suppose we want to know if the coin leans either way, and the professor wins if the coin is \(p \ge 1/2\). The hypotheses are:
-      \[H_0: p \ge 1/2 \qquad H_1: p < 1/2\]
-      and the parameter sets are \(\Theta_0 = [1/2, 1)\) and \(\Theta_1 = (0, 1/2)\).
-    </div>
+  <h2 class="sub" id="s1b">2.1.2 Method of Moments</h2>
+  <p>The Method of Moments (MoM) is the oldest estimation technique. It is based on a simple idea: set sample moments equal to population moments and solve for $\theta$.</p>
+  
+  <div class="box eg">
+    <div class="bt">Example · MoM for a Normal Distribution</div>
+    <p>Let $X_i \sim \mathcal{N}(\mu, \sigma^2)$. Setting sample moments equal to population moments gives:
+    $$\hat{\mu} = \bar{X}, \qquad \hat{\sigma}^2 = \frac{1}{n}\sum (X_i - \bar{X})^2$$</p>
   </div>
 
-  <div class="box box-example">
-    <div class="box-label">Example — Smart Opponent</div>
-    <div class="box-content">
-      Suppose our professor is a smart opponent who would never play with a coin for which \(p &lt; 1/2\). More reasonable hypotheses are:
-      \[H_0: p = 1/2 \qquad H_1: p < 1/2\]
-      with \(\Theta_0 = \{1/2\}\) and \(\Theta_1 = (0, 1/2)\). These do not cover the whole parameter space (since \(p > 1/2\) is excluded) — but that is fine.
-    </div>
+  <div class="strip strip-gold">
+    <div class="icon">💡</div>
+    <div><strong>Key insight:</strong> When you minimize cross-entropy loss in machine learning, you are maximizing the log-likelihood. MLE is the foundational justification for most modern loss functions.</div>
+  </div>
+</div>
+
+<div class="section" id="s2">
+  <h1 class="sec"><span class="n">2.2</span> The Likelihood Function</h1>
+  
+  <h2 class="sub" id="s2a">2.2.1 Definition and Construction</h2>
+  <div class="box def">
+    <div class="bt">Definition · Likelihood Function</div>
+    <p>The <strong>likelihood function</strong> $L(\theta;\mathbf{x})$ is defined as the joint density of the data, viewed as a function of the parameter $\theta$ with the data held fixed:</p>
+    $$L(\theta;\mathbf{x}) = \prod_{i=1}^n f(x_i;\theta)$$
+    <p>The <strong>MLE</strong> is the value that maximizes this: $\hat{\theta}_{\text{MLE}} = \operatorname*{arg\,max}_{\theta \in \Theta} L(\theta;\mathbf{x})$</p>
   </div>
 
-  <div class="box box-example">
-    <div class="box-label">Example 16.2 — HIV Testing</div>
-    <div class="box-content">
-      <p>People with HIV have extra antibodies, so we test by checking antibody concentration. We run many diluted samples, where each \(X_i \sim \mathcal{N}(\mu, \sigma^2)\), and check if \(\mu > \mu_0\) (our threshold). Suppose \(X_1, \ldots, X_n \overset{iid}{\sim} \mathcal{N}(\mu, \sigma^2)\) where \(\mu\) represents antibody concentration. The hypotheses are:</p>
-      \[H_0: \mu \ge \mu_0 \qquad H_1: \mu < \mu_0\]
-      and the parameter sets are:
-      \[\Theta_0 = [\mu_0, \infty) \times (0, \infty) \qquad \Theta_1 = (-\infty, \mu_0) \times (0, \infty)\]
-      <p>Don't forget to include \(\sigma^2\) in the parameter space!</p>
-      <p>There are two types of errors. A <strong>false negative</strong> means the patient is sick and we send them home — this is VERY dangerous. A <strong>false positive</strong> means the patient is fine and we treat them — not great, but not fatal. The null hypothesis should therefore be "the patient is sick," since we do not want to mistakenly reject this.</p>
-    </div>
+  <div class="box int">
+    <div class="bt">Intuition · Likelihood vs. Probability</div>
+    <p>Likelihood is <em>not</em> the probability that $\theta$ equals some value. It tells us how "compatible" each candidate value is with what we observed.</p>
   </div>
 
-  <h3>Asymmetry Between \(H_0\) and \(H_1\)</h3>
-  <ul class="clean">
-    <li>\(H_0\) is the <em>conservative default position</em>. We require evidence to overcome it.</li>
-    <li>If data is inconclusive, we side with \(H_0\) — not because it is true, but because we lack evidence against it.</li>
-    <li>We never "accept \(H_0\)." We can only <em>fail to reject</em> it.</li>
-    <li>\(H_1\) is the <em>scientific claim</em> — a discovery, an improvement, a new effect.</li>
-    <li>There is inherent asymmetry: in the case that \(H_0\) is true, it is very dangerous or costly to reject it. This determines the assignment of \(H_0\) and \(H_1\).</li>
-  </ul>
-
-  <div class="box box-insight">
-    <div class="box-label">The Use of H₁</div>
-    <div class="box-content">
-      <strong>Question:</strong> What is the use of defining \(H_1\) if we know nothing about it? <strong>Short answer:</strong> no use in this class. <strong>Long answer:</strong> it would still be ideal to control false positives (patient is healthy and we treat them) since there may be nontrivial costs. However, false negatives are much more dangerous, so we focus on them in this class. In advanced settings, \(H_1\) matters for computing power.
-    </div>
+  <h2 class="sub" id="s2b">2.2.2 The Log-Likelihood and Score Equation</h2>
+  <div class="fbox">
+    <div class="fl">Key Formula</div>
+    $$\ell(\theta;\mathbf{x}) = \log L(\theta;\mathbf{x}) = \sum_{i=1}^n \log f(x_i;\theta)$$
   </div>
+  <p>Maximizing the log-likelihood is equivalent to maximizing the likelihood because log is a strictly increasing function.</p>
+</div>
 
-  <div class="box box-insight">
-    <div class="box-label">The "Innocent Until Proven Guilty" Analogy</div>
-    <div class="box-content">
-      <strong>H₀ = innocent.</strong> The prosecution must bring enough evidence to convince the jury. Without sufficient evidence, the verdict is "not guilty" — which is not the same as "innocent." O.J. Simpson was found <em>not guilty
+</div>
+</body>
+</html>
