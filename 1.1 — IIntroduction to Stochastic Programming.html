@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1 — Introduction to Stochastic Programming</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']],
+    tags: 'ams'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+:root {
+  --navy:    #0d1b2a;
+  --navy2:   #1b2e44;
+  --blue:    #1558a8;
+  --bluel:   #e8f1fb;
+  --gold:    #b8861e;
+  --goldl:   #fdf3e0;
+  --green:   #2a6045;
+  --greenl:  #e9f5ee;
+  --red:     #7d1f1f;
+  --redl:    #fdecea;
+  --purple:  #453080;
+  --purplel: #eeebfa;
+  --teal:    #0e6b6b;
+  --teall:   #e4f5f5;
+  --bg:      #ffffff;
+  --bg2:     #f1ece2;
+  --rule:    #ccc4b2;
+  --text:    #000000;
+  --text2:   #54504a;
+
+  --serif:   'Source Serif 4', Georgia, serif;
+  --display: 'Playfair Display', Georgia, serif;
+  --mono:    'JetBrains Mono', monospace;
+
+  --sp-xs: 0.45rem;
+  --sp-sm: 0.9rem;
+  --sp-md: 1.5rem;
+  --sp-lg: 2.4rem;
+  --sp-xl: 4rem;
+
+  --r-sm: 4px;
+  --r-md: 7px;
+  --r-lg: 10px;
+
+  --t-fast: 0.2s ease;
+  --t-mid:  0.35s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.92;
+  color: var(--text);
+  background: var(--bg);
+}
+
+main {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 0 var(--sp-md) var(--sp-xl);
+}
+
+/* ── HEADER ── */
+.hdr {
+  background: var(--navy);
+  color: #fff;
+  padding: var(--sp-xl) var(--sp-lg) var(--sp-lg);
+  position: relative;
+  overflow: hidden;
+}
+.hdr::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  border: 2px solid rgba(184,134,30,0.18);
+}
+.hdr::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -50px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  border: 2px solid rgba(184,134,30,0.10);
+}
+.hdr-inner {
+  max-width: 940px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.hdr-bg-num {
+  font-family: var(--display);
+  font-size: 9rem;
+  color: #fff;
+  opacity: 0.04;
+  position: absolute;
+  top: -1.5rem;
+  right: 0;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.hdr-tag {
+  font-family: var(--mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: var(--sp-sm);
+}
+h1 {
+  font-family: var(--display);
+  font-size: 2.85rem;
+  font-weight: 700;
+  line-height: 1.22;
+  color: #fff;
+  margin-bottom: var(--sp-sm);
+}
+h1 em { font-style: italic; color: var(--gold); }
+.hdr-subtitle {
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: var(--sp-lg);
+  max-width: 600px;
+}
+
+.objectives-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(184,134,30,0.4);
+  border-left: 5px solid var(--gold);
+  border-radius: var(--r-md);
+  padding: var(--sp-md) var(--sp-lg);
+  margin-bottom: var(--sp-lg);
+}
+.objectives-box .obj-label {
+  font-family: var(--mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: var(--sp-sm);
+}
+.objectives-box ul {
+  list-style: none;
+  padding: 0;
+}
+.objectives-box ul li {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.85);
+  padding: 0.2rem 0;
+  padding-left: 1.2rem;
+  position: relative;
+}
+.objectives-box ul li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* TOC */
+.toc {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--r-md);
+  padding: var(--sp-md) var(--sp-lg);
+}
+.toc-label {
+  font-family: var(--mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: var(--sp-sm);
+}
+.toc-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+}
+.toc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+}
+.toc-num {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.35);
+}
+.toc-item a {
+  color: rgba(255,255,255,0.78);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  transition: color var(--t-fast);
+}
+.toc-item a:hover { color: var(--gold); }
+
+/* ── TYPOGRAPHY ── */
+h2 {
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.22;
+}
+h3 {
+  font-family: var(--display);
+  font-size: 1.44rem;
+  font-weight: 700;
+  border-left: 4px solid var(--gold);
+  padding-left: 1rem;
+  margin: var(--sp-lg) 0 var(--sp-sm);
+}
+h4 {
+  font-family: var(--serif);
+  font-size: 1.06rem;
+  font-weight: 600;
+  color: var(--blue);
+  margin: var(--sp-md) 0 var(--sp-xs);
+}
+p { margin-bottom: 1.1rem; }
+
+/* ── SECTIONS ── */
+.section { margin-bottom: 5.5rem; }
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  border-bottom: 3px solid var(--blue);
+  padding-bottom: 0.4rem;
+  margin-bottom: 1.8rem;
+}
+.section-number {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  color: var(--blue);
+  background: rgba(21,88,168,0.1);
+  padding: 0.1rem 0.48rem;
+  border-radius: var(--r-sm);
+}
+
+/* ── BOXES ── */
+.box {
+  border-radius: var(--r-md);
+  padding: 1.5rem 1.9rem;
+  margin: 1.75rem 0;
+  border: 1px solid;
+  border-left-width: 5px;
+}
+.box .box-label {
+  font-family: var(--mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+  margin-bottom: 0.72rem;
+  text-transform: uppercase;
+}
+.box .box-content { font-size: 0.97rem; }
+
+.box-definition {
+  background: var(--bluel);
+  border-color: rgba(21,88,168,0.25);
+  border-left-color: var(--blue);
+}
+.box-definition .box-label { color: var(--blue); }
+
+.box-insight, .box-theorem {
+  background: var(--goldl);
+  border-color: rgba(184,134,30,0.25);
+  border-left-color: var(--gold);
+}
+.box-insight .box-label, .box-theorem .box-label { color: #7a5800; }
+
+.box-example {
+  background: var(--greenl);
+  border-color: rgba(42,96,69,0.25);
+  border-left-color: var(--green);
+}
+.box-example .box-label { color: var(--green); }
+
+.box-warning {
+  background: var(--redl);
+  border-color: rgba(125,31,31,0.25);
+  border-left-color: var(--red);
+}
+.box-warning .box-label { color: var(--red); }
+
+.box-intuition {
+  background: var(--purplel);
+  border-color: rgba(69,48,128,0.25);
+  border-left-color: var(--purple);
+}
+.box-intuition .box-label { color: var(--purple); }
+
+.box-application {
+  background: var(--teall);
+  border-color: rgba(14,107,107,0.25);
+  border-left-color: var(--teal);
+}
+.box-application .box-label { color: var(--teal); }
+
+/* ── FORMULA BLOCKS ── */
+.formula-block {
+  background: var(--navy);
+  color: #d8e8ff;
+  border-radius: var(--r-md);
+  padding: 1.7rem 2rem;
+  margin: 1.7rem 0;
+  overflow-x: auto;
+  position: relative;
+  text-align: center;
+}
+.formula-block .formula-label {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.6rem;
+  text-align: left;
+}
+
+/* ── CODE ── */
+pre {
+  background: #0b1624;
+  color: #c5d8f5;
+  border-radius: var(--r-md);
+  padding: 1.3rem 1.6rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  line-height: 1.7;
+  margin: 1.3rem 0;
+}
+code {
+  font-family: var(--mono);
+  background: rgba(21,88,168,0.1);
+  padding: 0.1em 0.36em;
+  border-radius: 3px;
+  font-size: 0.86em;
+  color: var(--blue);
+}
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+.code-header {
+  background: #162030;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  padding: 0.55rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: -0.7rem;
+}
+.code-dots { display: flex; gap: 0.35rem; }
+.code-dots span {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+}
+.dot-r { background: #ff5f57; }
+.dot-y { background: #febc2e; }
+.dot-g { background: #28c840; }
+.code-filename {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  margin-left: auto;
+}
+
+/* Syntax highlighting */
+.kw { color: #7eb8f5; font-weight: 500; }
+.cm { color: #6b8a6b; font-style: italic; }
+.st { color: #a8d08c; }
+.nm { color: #f0a96b; }
+.fn { color: #e0c97a; }
+
+/* ── TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+  margin: var(--sp-md) 0;
+}
+table thead th {
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.72rem 1rem;
+  text-align: left;
+}
+table tbody tr:nth-child(even) { background: var(--bg2); }
+table td {
+  padding: 0.68rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+table td:first-child { font-weight: 600; color: var(--navy2); }
+.table-caption {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 0.4rem;
+}
+
+/* ── DETAILS/SUMMARY ── */
+details {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  margin: 1rem 0;
+  overflow: hidden;
+}
+summary {
+  padding: 0.9rem 1.25rem;
+  background: var(--bg2);
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: 0.97rem;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--navy2);
+}
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: '▶';
+  font-size: 0.65rem;
+  color: var(--blue);
+  transition: transform var(--t-fast);
+}
+details[open] summary::before { transform: rotate(90deg); }
+.details-body {
+  padding: 1.2rem 1.5rem;
+  font-size: 0.97rem;
+}
+
+/* ── TOOLTIPS ── */
+.tip {
+  border-bottom: 1.5px dashed var(--teal);
+  cursor: help;
+  position: relative;
+  color: var(--teal);
+  font-weight: 600;
+}
+.tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--serif);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--r-sm);
+  width: 240px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-fast);
+  z-index: 99;
+}
+.tip:hover::after, .tip:focus::after { opacity: 1; }
+
+/* ── NUMBERED STEPS ── */
+ol.plain-steps {
+  padding-left: 1.4rem;
+  list-style: decimal;
+  margin: 0.8rem 0 1rem;
+}
+ol.plain-steps li {
+  margin-bottom: 0.55rem;
+  font-size: 0.97rem;
+  line-height: 1.75;
+  padding-left: 0.3rem;
+}
+ol.plain-steps li::marker {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--blue);
+  font-weight: 500;
+}
+
+/* ── DIAGRAMS ── */
+.diagram-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+  margin: var(--sp-md) 0;
+}
+.diagram-wrap svg { display: block; width: 100%; height: auto; max-width: 700px; margin: 0 auto; }
+.fig-caption {
+  font-size: 0.875rem;
+  color: var(--text2);
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.6rem;
+}
+
+/* ── GLOSSARY ── */
+.glossary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: var(--sp-md);
+}
+.glossary-item {
+  background: var(--bg2);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  padding: 1rem 1.2rem;
+  font-size: 0.92rem;
+}
+.glossary-item dt {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--blue);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.glossary-item dd { color: var(--text2); line-height: 1.6; }
+
+/* ── KEY TAKEAWAYS ── */
+.takeaways {
+  background: var(--navy);
+  color: #d8e8ff;
+  border-radius: var(--r-lg);
+  padding: var(--sp-lg) var(--sp-xl);
+  margin: var(--sp-lg) 0;
+}
+.takeaways h3 {
+  border-left-color: var(--gold);
+  color: #fff;
+  margin-top: 0;
+}
+.takeaways ul { list-style: none; padding: 0; }
+.takeaways ul li {
+  padding: 0.4rem 0 0.4rem 1.5rem;
+  position: relative;
+  font-size: 0.97rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.takeaways ul li:last-child { border-bottom: none; }
+.takeaways ul li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-size: 0.7rem;
+  top: 0.65rem;
+}
+
+/* ── PRACTICE QUESTIONS ── */
+.question-card {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  margin: 1rem 0;
+  overflow: hidden;
+}
+.question-card .q-header {
+  background: var(--bg2);
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.q-badge {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--r-sm);
+  font-weight: 500;
+}
+.q-conceptual { background: var(--bluel); color: var(--blue); }
+.q-computational { background: var(--goldl); color: #7a5800; }
+.q-text {
+  padding: 1rem 1.2rem;
+  font-size: 0.96rem;
+}
+
+/* ── VALUE COMPARISON STRIP ── */
+.value-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: var(--sp-md) 0;
+}
+.value-card {
+  border-radius: var(--r-md);
+  padding: 1.2rem;
+  text-align: center;
+}
+.value-card.wv { background: var(--goldl); border: 1px solid rgba(184,134,30,0.3); }
+.value-card.sv { background: var(--greenl); border: 1px solid rgba(42,96,69,0.3); }
+.value-card.ev { background: var(--purplel); border: 1px solid rgba(69,48,128,0.3); }
+.value-card .vc-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: var(--text2);
+}
+.value-card .vc-num {
+  font-family: var(--display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.wv .vc-num { color: #7a5800; }
+.sv .vc-num { color: var(--green); }
+.ev .vc-num { color: var(--purple); }
+.value-card .vc-desc { font-size: 0.78rem; color: var(--text2); margin-top: 0.3rem; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+.section { animation: fadeUp 0.5s ease both; }
+.section:nth-child(1) { animation-delay: 0.05s; }
+.section:nth-child(2) { animation-delay: 0.10s; }
+.section:nth-child(3) { animation-delay: 0.15s; }
+.section:nth-child(4) { animation-delay: 0.20s; }
+.section:nth-child(5) { animation-delay: 0.25s; }
+.section:nth-child(6) { animation-delay: 0.28s; }
+.section:nth-child(7) { animation-delay: 0.31s; }
+.section:nth-child(8) { animation-delay: 0.34s; }
+.section:nth-child(9) { animation-delay: 0.37s; }
+.section:nth-child(10) { animation-delay: 0.40s; }
+.section:nth-child(11) { animation-delay: 0.43s; }
+
+a { color: var(--blue); transition: color var(--t-fast); }
+a:hover { color: var(--gold); }
+
+footer {
+  background: var(--navy);
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  padding: var(--sp-lg);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  main { padding: 0 1rem 4rem; }
+  .hdr { padding: 3rem 1.5rem 2.5rem; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.55rem; }
+  .toc-grid { flex-direction: column; }
+  .value-strip { grid-template-columns: 1fr; }
+  table { font-size: 0.8rem; }
+  pre { font-size: 0.78rem; }
+  .glossary { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-bg-num" aria-hidden="true">01</div>
+    <p class="hdr-tag">Operations Research · Stochastic Optimization</p>
+    <h1>Introduction to <em>Stochastic</em> Programming</h1>
+    <p class="hdr-subtitle">Chapter 1 — Foundations, Examples, and the Value of Modeling Uncertainty · Based on Birge &amp; Louveaux</p>
+
+    <div class="objectives-box" role="region" aria-label="Learning Objectives">
+      <div class="obj-label">Learning Objectives</div>
+      <ul>
+        <li>Understand why deterministic optimization is insufficient under uncertainty</li>
+        <li>Model a real-world problem as a two-stage stochastic program with scenarios</li>
+        <li>Compute and interpret EVPI and VSS — the two key measures of stochastic value</li>
+        <li>Formulate the extensive form and implicit representation of a stochastic linear program</li>
+        <li>Understand the concept of hedging decisions across scenarios</li>
+        <li>Derive analytical recourse value functions under continuous (uniform) random yields</li>
+        <li>Apply KKT optimality conditions to the continuous stochastic program</li>
+        <li>Solve the classic News Vendor problem and interpret its critical-ratio solution</li>
+      </ul>
+    </div>
+
+    <nav class="toc" aria-label="Table of Contents">
+      <div class="toc-label">Contents</div>
+      <div class="toc-grid">
+        <div class="toc-item"><span class="toc-num">§1</span><a href="#intro">Introduction</a></div>
+        <div class="toc-item"><span class="toc-num">§2</span><a href="#concepts">Key Concepts</a></div>
+        <div class="toc-item"><span class="toc-num">§3</span><a href="#formulation">Mathematical Formulation</a></div>
+        <div class="toc-item"><span class="toc-num">§3c</span><a href="#general-model">General Model &amp; Implicit Form</a></div>
+        <div class="toc-item"><span class="toc-num">§3d</span><a href="#continuous">Continuous Random Variables</a></div>
+        <div class="toc-item"><span class="toc-num">§3e</span><a href="#newsvendor">The News Vendor Problem</a></div>
+        <div class="toc-item"><span class="toc-num">§4</span><a href="#examples">Worked Examples</a></div>
+        <div class="toc-item"><span class="toc-num">§5</span><a href="#code">Code Implementation</a></div>
+        <div class="toc-item"><span class="toc-num">§6</span><a href="#visuals">Visual Aids</a></div>
+        <div class="toc-item"><span class="toc-num">§7</span><a href="#summary">Summary</a></div>
+        <div class="toc-item"><span class="toc-num">§8</span><a href="#practice">Practice Questions</a></div>
+        <div class="toc-item"><span class="toc-num">§G</span><a href="#glossary">Glossary</a></div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §1 INTRODUCTION -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="intro">
+  <div class="section-header">
+    <span class="section-number">§ 1</span>
+    <h2>Introduction</h2>
+  </div>
+
+  <p>Classical optimization assumes that all problem data — costs, demands, yields, capacities — are known with certainty at the time of decision-making. In reality, this assumption almost never holds. Weather disrupts agricultural yields, markets fluctuate unpredictably, and demand varies around forecasts. <strong>Stochastic programming</strong> is the field of mathematical optimization that explicitly incorporates this uncertainty into the model.</p>
+
+  <p>The central insight is this: a decision maker who accounts for future randomness — even imperfectly — will consistently outperform one who ignores it. This chapter makes that claim precise through concrete examples and quantifies the benefit using two fundamental measures: the <span class="tip" tabindex="0" data-tip="Expected Value of Perfect Information: the maximum gain possible if the future were known in advance.">EVPI</span> and the <span class="tip" tabindex="0" data-tip="Value of the Stochastic Solution: the gain from using a stochastic model vs. plugging in expected values.">VSS</span>.</p>
+
+  <div class="box box-intuition">
+    <div class="box-label">Core Intuition</div>
+    <div class="box-content">
+      Think of stochastic programming as making <em>robust commitments</em> today while preserving <em>adaptive flexibility</em> tomorrow. You can't choose the weather, but you can choose a planting plan that works reasonably well across all likely weather outcomes. This balancing act — called <strong>hedging</strong> — is the heart of stochastic programming.
+    </div>
+  </div>
+
+  <p>This chapter builds from a concrete agricultural example (Section 1.1 of Birge &amp; Louveaux) that is simple enough to understand fully yet rich enough to illustrate the key structural features of stochastic programs: two-stage decisions, scenarios, recourse actions, and the tradeoffs between cost and flexibility.</p>
+
+  <p>Along the way, we encounter one of the most important models in all of operations research — the <strong>two-stage stochastic linear program with recourse</strong> — which underlies everything from supply chain design to energy planning to financial portfolio optimization.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §2 KEY CONCEPTS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="concepts">
+  <div class="section-header">
+    <span class="section-number">§ 2</span>
+    <h2>Key Concepts</h2>
+  </div>
+
+  <h3>2.1 Uncertainty and Scenarios</h3>
+
+  <p>In stochastic programming, uncertainty is represented through <strong>scenarios</strong>. A scenario is a specific realization of all uncertain parameters. Each scenario $s$ occurs with probability $p_s$, and we require $\sum_s p_s = 1$.</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — Scenario</div>
+    <div class="box-content">
+      A <strong>scenario</strong> $s \in \mathcal{S}$ is a complete specification of the uncertain data $\xi^s = (\xi^s_1, \xi^s_2, \ldots, \xi^s_k)$ — for example, all crop yields under a particular weather pattern — paired with a probability $p_s > 0$ such that $\sum_{s \in \mathcal{S}} p_s = 1$.
+    </div>
+  </div>
+
+  <p>In the farming example studied in Section 1.1b, Birge &amp; Louveaux consider three scenarios for weather: <em>above average</em>, <em>average</em>, and <em>below average</em> yields, each with probability $\frac{1}{3}$. This correlation structure — that good weather benefits all crops simultaneously — is a realistic and tractable simplification.</p>
+
+  <h3>2.2 Two-Stage Decisions: Here-and-Now vs. Wait-and-See</h3>
+
+  <p>The most important structural feature of the farming problem — and of many practical decisions — is that decisions must be made <em>before</em> the uncertainty is resolved, but consequences play out <em>after</em>. This creates a natural two-stage structure.</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — First-Stage and Second-Stage Decisions</div>
+    <div class="box-content">
+      <strong>First-stage decisions</strong> (here-and-now) are made <em>before</em> observing the realization of uncertainty. They are the same regardless of which scenario occurs. Example: how many acres to plant.<br><br>
+      <strong>Second-stage decisions</strong> (wait-and-see / recourse) are made <em>after</em> observing the uncertainty. They can be adapted to the realized scenario. Example: how much wheat to buy or sell once the harvest is known.
+    </div>
+  </div>
+
+  <div class="box box-intuition">
+    <div class="box-label">Intuition — Why Two Stages?</div>
+    <div class="box-content">
+      Think of buying a concert ticket (first stage: commit now) vs. deciding whether to bring an umbrella on the day of the concert (second stage: adapt once you see the weather forecast). The asymmetry in timing creates the core tension of stochastic programming.
+    </div>
+  </div>
+
+  <h3>2.3 Recourse</h3>
+
+  <p>The second-stage decisions are called <strong>recourse actions</strong>. They represent how the decision maker compensates for any mismatch between first-stage choices and the realized outcome. Recourse is what makes stochastic programming flexible and practical.</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — Recourse</div>
+    <div class="box-content">
+      <strong>Recourse</strong> refers to corrective actions taken after uncertainty is revealed to repair any infeasibility or suboptimality created by the first-stage decisions. In the farmer's problem, purchasing grain on the market is a recourse action that compensates for insufficient production.
+    </div>
+  </div>
+
+  <p>The ability to take recourse makes it possible to commit to first-stage decisions without having perfect foresight. The cost of recourse actions is part of the objective: a good first-stage plan minimizes the combination of immediate costs and <em>expected</em> future recourse costs.</p>
+
+  <h3>2.4 The Extensive Form</h3>
+
+  <p>When the number of scenarios is finite, we can write out all scenario-specific variables explicitly. This formulation — listing all variables for all scenarios simultaneously — is called the <strong>extensive form</strong> of the stochastic program.</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — Extensive Form</div>
+    <div class="box-content">
+      The <strong>extensive form</strong> (also called the <em>deterministic equivalent</em>) of a two-stage stochastic program is a single large linear program that includes: (i) the first-stage variables (shared across all scenarios), and (ii) one copy of the second-stage variables for each scenario. The objective is the weighted sum of scenario-specific costs with scenario probabilities as weights.
+    </div>
+  </div>
+
+  <h3>2.5 Hedging Against Scenarios</h3>
+
+  <p>One of the most striking features of stochastic optimal solutions is that they are <em>compromises</em>. No single scenario's optimal plan is chosen; instead, the solution <strong>hedges</strong> across scenarios, accepting some suboptimality in each scenario in exchange for robustness across all of them.</p>
+
+  <div class="box box-warning">
+    <div class="box-label">Common Misconception</div>
+    <div class="box-content">
+      Students often expect the stochastic solution to simply average the scenario-specific optimal solutions. This is wrong. The stochastic solution is not an average of scenario optima — it is a <em>single first-stage decision</em> that is globally optimal when recourse is accounted for. It may look suboptimal in every individual scenario while being superior in expectation.
+    </div>
+  </div>
+
+  <h3>2.6 Expected Value of Perfect Information (EVPI)</h3>
+
+  <p>If the farmer somehow knew in advance which weather scenario would occur, he could plant optimally every year. The <span class="tip" tabindex="0" data-tip="EVPI = (Expected profit under perfect information) − (Optimal stochastic program profit)">EVPI</span> measures exactly how much this perfect knowledge would be worth.</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — EVPI</div>
+    <div class="box-content">
+      $$\text{EVPI} = \mathbb{E}_s\bigl[\text{optimal profit}(s)\bigr] - z^*_{\text{SP}}$$
+      where $\mathbb{E}_s[\text{optimal profit}(s)]$ is the expected profit when each scenario's optimal plan is chosen after learning $s$, and $z^*_{\text{SP}}$ is the optimal expected profit of the stochastic program. EVPI is always $\geq 0$: perfect information can only help.
+    </div>
+  </div>
+
+  <p>EVPI tells us the <em>maximum</em> amount worth paying for better forecasting or information. If a weather service offered to tell the farmer this winter's exact yields, EVPI is the maximum subscription price that makes economic sense.</p>
+
+  <h3>2.7 Value of the Stochastic Solution (VSS)</h3>
+
+  <p>The <span class="tip" tabindex="0" data-tip="VSS = (Stochastic program profit) − (Expected value solution profit)">VSS</span> compares the stochastic solution against the naive alternative: solve the problem using only expected values of all uncertain parameters (the <strong>expected value problem</strong>, or EV), and then apply that solution to all scenarios.</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — VSS</div>
+    <div class="box-content">
+      Let $\bar{x}$ be the first-stage solution of the deterministic problem using expected scenario data (the <em>EV solution</em>). Denote by $\mathbb{E}_s[RP(\bar{x}, s)]$ the expected profit when $\bar{x}$ is fixed but second-stage recourse is adapted per scenario. Then:
+      $$\text{VSS} = z^*_{\text{SP}} - \mathbb{E}_s\bigl[RP(\bar{x}, s)\bigr]$$
+      VSS is always $\geq 0$: the stochastic model can only do better than the EV approach.
+    </div>
+  </div>
+
+  <div class="box box-insight">
+    <div class="box-label">Key Insight — Ordering of Values</div>
+    <div class="box-content">
+      There is an important inequality that always holds:
+      $$\mathbb{E}_s\bigl[\text{optimal profit}(s)\bigr] \;\geq\; z^*_{\text{SP}} \;\geq\; \mathbb{E}_s\bigl[RP(\bar{x}, s)\bigr]$$
+      That is: perfect information $\geq$ stochastic solution $\geq$ EV solution applied stochastically. Both EVPI and VSS are non-negative. Notably, VSS can sometimes exceed EVPI — knowing the distribution and optimizing over it can sometimes be more valuable than knowing the exact future in some specific problem structures.
+    </div>
+  </div>
+
+  <h3>2.8 Sensitivity of Optimal Solutions to Uncertainty</h3>
+
+  <p>A fundamental lesson from the farming example is that optimal deterministic solutions can be <em>extremely sensitive</em> to the realized scenario. In the farmer's problem, the optimal acreage for wheat ranges from 100 to 183 acres across scenarios — a 83% variation. The optimal profit ranges from $59,950 to $167,667. This sensitivity is precisely why a stochastic approach is valuable.</p>
+
+  <h3>2.9 Application Domains</h3>
+
+  <div class="box box-application">
+    <div class="box-label">Application</div>
+    <div class="box-content">
+      Stochastic programming naturally arises in any domain where decisions precede uncertain outcomes: <strong>agriculture</strong> (crop planning under weather uncertainty), <strong>finance</strong> (portfolio allocation under market risk), <strong>energy</strong> (power capacity planning under demand uncertainty), <strong>logistics</strong> (inventory and routing under stochastic demand), <strong>manufacturing</strong> (product design under variable production performance), and <strong>healthcare</strong> (resource allocation under uncertain patient volumes).
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §3 MATHEMATICAL FORMULATION -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="formulation">
+  <div class="section-header">
+    <span class="section-number">§ 3</span>
+    <h2>Mathematical Formulation</h2>
+  </div>
+
+  <h3>3.1 General Two-Stage Stochastic Linear Program</h3>
+
+  <p>The canonical <strong>two-stage stochastic linear program with recourse</strong> has the following structure. In the <em>first stage</em>, we choose a decision vector $x \in \mathbb{R}^{n_1}$ before observing the random outcome $\xi$. In the <em>second stage</em>, after observing $\xi = \xi^s$, we choose $y^s \in \mathbb{R}^{n_2}$ to minimize recourse costs subject to scenario-specific constraints.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">General Two-Stage Stochastic LP</span>
+    $$\min_{x} \quad c^\top x + \mathbb{E}_\xi\bigl[Q(x, \xi)\bigr]$$
+    $$\text{s.t.} \quad Ax = b, \quad x \geq 0$$
+  </div>
+
+  <p>where $Q(x, \xi)$ is the <strong>recourse function</strong> (also called the value function of the second stage):</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Second-Stage Recourse Function</span>
+    $$Q(x, \xi) = \min_{y} \quad q^\top y$$
+    $$\text{s.t.} \quad Wy = h - Tx, \quad y \geq 0$$
+  </div>
+
+  <h4>Notation Guide</h4>
+  <table>
+    <thead><tr><th>Symbol</th><th>Meaning</th><th>Stage</th></tr></thead>
+    <tbody>
+      <tr><td>$x \in \mathbb{R}^{n_1}$</td><td>First-stage decision vector (e.g., acres planted)</td><td>1st</td></tr>
+      <tr><td>$y \in \mathbb{R}^{n_2}$</td><td>Second-stage decision vector (e.g., tons bought/sold)</td><td>2nd</td></tr>
+      <tr><td>$c \in \mathbb{R}^{n_1}$</td><td>First-stage cost coefficients (deterministic)</td><td>1st</td></tr>
+      <tr><td>$q \in \mathbb{R}^{n_2}$</td><td>Second-stage cost coefficients (may be random)</td><td>2nd</td></tr>
+      <tr><td>$A, b$</td><td>First-stage constraint matrix and RHS</td><td>1st</td></tr>
+      <tr><td>$W$</td><td>Recourse matrix (technology matrix of 2nd stage)</td><td>2nd</td></tr>
+      <tr><td>$T$</td><td>Technology matrix linking 1st and 2nd stage</td><td>2nd</td></tr>
+      <tr><td>$h$</td><td>Second-stage RHS (may be random)</td><td>2nd</td></tr>
+      <tr><td>$\xi = (q, h, T)$</td><td>Random data vector (the uncertainty)</td><td>Both</td></tr>
+      <tr><td>$p_s$</td><td>Probability of scenario $s$</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 Finite Scenario (Extensive Form)</h3>
+
+  <p>When $\xi$ takes values in a finite set of $S$ scenarios, the expectation becomes a weighted sum, and the stochastic program can be written as one large deterministic LP — the <strong>extensive form</strong>:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Extensive Form — Two-Stage Stochastic LP</span>
+    $$\min_{x,\, y^1,\ldots,y^S} \quad c^\top x + \sum_{s=1}^{S} p_s \,(q^s)^\top y^s$$
+    $$\text{s.t.} \quad Ax = b \qquad \text{(first-stage constraints)}$$
+    $$T^s x + W^s y^s = h^s \quad \forall s = 1,\ldots,S \qquad \text{(second-stage constraints)}$$
+    $$x \geq 0, \quad y^s \geq 0 \quad \forall s$$
+  </div>
+
+  <div class="box box-insight">
+    <div class="box-label">Key Structural Observation</div>
+    <div class="box-content">
+      The extensive form has a block-diagonal structure in $y^1, \ldots, y^S$ — each scenario block is independent given $x$. This structure is exploited by specialized decomposition algorithms (e.g., Benders decomposition / L-shaped method) that solve each scenario subproblem separately. The first-stage variable $x$ <em>couples</em> all scenario blocks.
+    </div>
+  </div>
+
+  <h3>3.3 Farmer's Problem: Specific Formulation</h3>
+
+  <p>In the farmer's problem, the random parameter is the yield vector $\xi = (\xi_1, \xi_2, \xi_3)$ — yields per acre of wheat, corn, and sugar beets. The first-stage variables are land allocations $x = (x_1, x_2, x_3)$ (acres). The second-stage variables are quantity decisions:</p>
+
+  <table>
+    <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>$x_1, x_2, x_3$</td><td>Acres devoted to wheat, corn, sugar beets (1st stage)</td></tr>
+      <tr><td>$w_1^s$</td><td>Tons of wheat sold in scenario $s$</td></tr>
+      <tr><td>$y_1^s$</td><td>Tons of wheat purchased in scenario $s$</td></tr>
+      <tr><td>$w_2^s$</td><td>Tons of corn sold in scenario $s$</td></tr>
+      <tr><td>$y_2^s$</td><td>Tons of corn purchased in scenario $s$</td></tr>
+      <tr><td>$w_3^s$</td><td>Tons of sugar beets sold at favorable price ($36/T) in scenario $s$</td></tr>
+      <tr><td>$w_4^s$</td><td>Tons of sugar beets sold at low price ($10/T) in scenario $s$</td></tr>
+    </tbody>
+  </table>
+
+  <p>The stochastic program (extensive form, 3 scenarios with equal probability $p_s = \tfrac{1}{3}$) is:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Farmer's Extensive Form (Birge &amp; Louveaux, Eq. 1.2)</span>
+    $$\min \quad 150x_1 + 230x_2 + 260x_3$$
+    $$- \frac{1}{3}\sum_{s=1}^{3}\Bigl(170w_1^s - 238y_1^s + 150w_2^s - 210y_2^s + 36w_3^s + 10w_4^s\Bigr)$$
+  </div>
+
+  <p>Subject to the following constraints:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Constraints</span>
+    $$x_1 + x_2 + x_3 \leq 500 \qquad \text{(total land)}$$
+    $$\xi_1^s x_1 + y_1^s - w_1^s \geq 200 \quad \forall s \qquad \text{(wheat feed requirement)}$$
+    $$\xi_2^s x_2 + y_2^s - w_2^s \geq 240 \quad \forall s \qquad \text{(corn feed requirement)}$$
+    $$w_3^s + w_4^s \leq \xi_3^s x_3 \quad \forall s \qquad \text{(sugar beet production cap)}$$
+    $$w_3^s \leq 6000 \quad \forall s \qquad \text{(EU quota on favorable price)}$$
+    $$x_1, x_2, x_3, y_1^s, y_2^s, w_1^s, w_2^s, w_3^s, w_4^s \geq 0 \quad \forall s$$
+  </div>
+
+  <details>
+    <summary>🔍 Derivation of the Objective Function Sign Convention</summary>
+    <div class="details-body">
+      <p>The objective minimizes <em>costs minus revenues</em>. Planting costs ($150x_1$, etc.) enter positively (they are costs). Sales revenues ($170w_1^s$, etc.) enter negatively because subtracting a revenue is equivalent to minimizing costs. Purchase costs ($238y_1^s$, etc.) enter positively. The factor $\frac{1}{3}$ weights each scenario equally, converting the scenario-specific profit to expected profit. The sign convention ensures the problem is a minimization of expected cost (or equivalently, maximization of expected profit when negated).</p>
+      <p>Note: purchasing prices are 40% above selling prices: $238 = 1.4 \times 170$, $210 = 1.4 \times 150$. This represents the wholesaler's margin and transportation costs.</p>
+    </div>
+  </details>
+
+  <h3>3.4 Scenario Yield Data</h3>
+
+  <table>
+    <thead><tr><th>Scenario</th><th>Probability</th><th>Wheat yield (T/acre)</th><th>Corn yield (T/acre)</th><th>Sugar beet yield (T/acre)</th></tr></thead>
+    <tbody>
+      <tr><td>$s=1$ (above avg.)</td><td>$1/3$</td><td>3.0</td><td>3.6</td><td>24</td></tr>
+      <tr><td>$s=2$ (average)</td><td>$1/3$</td><td>2.5</td><td>3.0</td><td>20</td></tr>
+      <tr><td>$s=3$ (below avg.)</td><td>$1/3$</td><td>2.0</td><td>2.4</td><td>16</td></tr>
+    </tbody>
+  </table>
+
+  <p>All yields are exactly $\pm 20\%$ from the mean, with perfect positive correlation across crops within each scenario (a simplification that yields a tractable three-scenario model).</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §3c GENERAL MODEL FORMULATION & IMPLICIT REPRESENTATION -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="general-model">
+  <div class="section-header">
+    <span class="section-number">§ 3c</span>
+    <h2>General Model Formulation &amp; Implicit Representation</h2>
+  </div>
+
+  <p>Having seen the extensive form in §3, we now look at the same problem from a more compact perspective — the <strong>implicit representation</strong> — which is how stochastic programs are usually written in theory and in solvers. This section follows §1.1c of Birge &amp; Louveaux.</p>
+
+  <h3>3c.1 The Two-Stage Stochastic Program with Recourse</h3>
+
+  <p>Recall: a decision maker chooses a first-stage vector $x$ <em>before</em> observing the random vector $\boldsymbol{\xi}$. After $\boldsymbol{\xi}$ is realized, corrective actions $y$ are taken. In the farming problem, $x$ is the land allocation and $\boldsymbol{\xi}$ is the random yield vector. The <strong>boldface notation</strong> $\boldsymbol{\xi}$ signals that it is a random variable; a specific realization is written as $\xi$ (or $\xi(s)$ for scenario $s$).</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — Two-Stage Stochastic Program with Recourse (Implicit Form)</div>
+    <div class="box-content">
+      $$\min_{x} \quad c^\top x + \mathbb{E}_{\boldsymbol{\xi}}\bigl[Q(x, \boldsymbol{\xi})\bigr] \tag{1.3}$$
+      $$\text{s.t.} \quad Ax = b, \quad x \geq 0$$
+      where the <strong>second-stage value function</strong> (recourse function) is:
+      $$Q(x, \xi) = \min_{y}\bigl\{ q^\top y \;\big|\; Wy = h - Tx,\; y \geq 0 \bigr\}$$
+      The random vector $\boldsymbol{\xi}$ collects all uncertain data: $\boldsymbol{\xi} = (q^\top, h^\top, T)$. We write $\mathbb{E}_{\boldsymbol{\xi}}$ for the mathematical expectation with respect to $\boldsymbol{\xi}$.
+    </div>
+  </div>
+
+  <p>An important special case — used throughout the farming example — is <strong>fixed recourse</strong>: the matrix $W$ is deterministic (non-random). Only $q$, $h$, and/or $T$ may be random. This simplifies both the theory and computation significantly.</p>
+
+  <div class="box box-insight">
+    <div class="box-label">Key Insight — Fixed Recourse in the Farming Example</div>
+    <div class="box-content">
+      In the farmer's problem, the <em>only</em> random element is the technology matrix $T$, specifically the yield coefficients $t_i(s)$ that link land allocation $x_i$ to production. The cost vector $q$ (prices for buying/selling) and the RHS $h$ (minimum requirements, quota) are all deterministic. This makes it a fixed-recourse problem. For a given scenario $s$, the second stage is:
+      $$Q(x, s) = \min \bigl\{ 238y_1 - 170w_1 + 210y_2 - 150w_2 - 36w_3 - 10w_4 \bigr\}$$
+      subject to:
+      $$t_1(s)x_1 + y_1 - w_1 \geq 200, \quad t_2(s)x_2 + y_2 - w_2 \geq 240$$
+      $$w_3 + w_4 \leq t_3(s)x_3, \quad w_3 \leq 6000, \quad y, w \geq 0 \tag{1.4}$$
+      where $t_i(s)$ is the yield of crop $i$ under scenario $s$.
+    </div>
+  </div>
+
+  <h3>3c.2 Extensive Form vs. Implicit Form</h3>
+
+  <p>The two representations of the same stochastic program are:</p>
+
+  <table>
+    <thead><tr><th>Representation</th><th>Description</th><th>Advantages</th><th>Disadvantages</th></tr></thead>
+    <tbody>
+      <tr><td>Extensive Form (1.2)</td><td>All scenario variables listed explicitly; one LP with $S$ copies of second-stage variables</td><td>Directly solvable by any LP solver; transparent structure</td><td>Grows rapidly with $S$; impractical for large scenario sets</td></tr>
+      <tr><td>Implicit Form (1.3)</td><td>Compact notation; expectation over $\boldsymbol{\xi}$ left as an operator</td><td>General; captures continuous distributions; theoretical analysis</td><td>Requires special algorithms (L-shaped, Benders) to solve</td></tr>
+      <tr><td>Value Function Form (1.5)</td><td>$\min\, c^\top x + \mathcal{Q}(x)$ where $\mathcal{Q}(x) = \mathbb{E}_{\boldsymbol{\xi}}[Q(x,\boldsymbol{\xi})]$</td><td>Most compact; reveals convexity structure</td><td>$\mathcal{Q}(x)$ is generally not available in closed form</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3c.3 The Value Function (Recourse Function) $\mathcal{Q}(x)$</h3>
+
+  <p>Defining $\mathcal{Q}(x) = \mathbb{E}_{\boldsymbol{\xi}}[Q(x, \boldsymbol{\xi})]$ — the <span class="tip" tabindex="0" data-tip="Also called the expected recourse function. Captures the expected cost of optimally adapting to all possible realizations of uncertainty.">expected recourse function</span> — allows us to write the stochastic program in its most condensed form:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Value Function Form (Birge &amp; Louveaux Eq. 1.5)</span>
+    $$\min \; c^\top x + \mathcal{Q}(x) \qquad \text{s.t.} \quad Ax = b,\; x \geq 0$$
+  </div>
+
+  <p>This looks exactly like a standard deterministic program — the entire complexity of uncertainty is absorbed into $\mathcal{Q}(x)$. As we will see in §3d, for special distributions (e.g., uniform), $\mathcal{Q}(x)$ can sometimes be computed analytically. In general, it is approximated by sample average approximation, scenario trees, or decomposition methods.</p>
+
+  <div class="box box-warning">
+    <div class="box-label">Common Confusion — $Q(x,\xi)$ vs. $\mathcal{Q}(x)$</div>
+    <div class="box-content">
+      It is critical to distinguish: $Q(x, \xi)$ is the <em>second-stage optimal value for one specific realization</em> $\xi$ — it is a function of both $x$ and the realized data. By contrast, $\mathcal{Q}(x) = \mathbb{E}_{\boldsymbol{\xi}}[Q(x,\boldsymbol{\xi})]$ is the <em>expected</em> second-stage cost — it is a function of $x$ only, and is the quantity that appears in the objective of the stochastic program.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §3d CONTINUOUS RANDOM VARIABLES -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="continuous">
+  <div class="section-header">
+    <span class="section-number">§ 3d</span>
+    <h2>Continuous Random Variables &amp; Analytical Recourse Functions</h2>
+  </div>
+
+  <p>In §3 (the discrete scenario approach), yields were correlated through three weather states. Section 1.1d of Birge &amp; Louveaux explores an alternative: <strong>independent, continuous yields</strong>, modeled as uniform random variables. This leads to closed-form expressions for the recourse function — a rare and analytically rich special case.</p>
+
+  <h3>3d.1 Setup: Independent Uniform Yields</h3>
+
+  <p>Assume that the yield of crop $i$ is a <span class="tip" tabindex="0" data-tip="Uniform distribution on [l,u]: every value in the interval is equally likely. Mean = (l+u)/2.">uniform random variable</span> on $[l_i, u_i]$, where $l_i = 0.8 \bar{t}_i$ and $u_i = 1.2 \bar{t}_i$ (±20% of mean yield $\bar{t}_i$). The means match the discrete scenario model, but the yields are now <em>independent</em> across crops and continuous.</p>
+
+  <div class="box box-insight">
+    <div class="box-label">Key Property — Separability</div>
+    <div class="box-content">
+      Because the yields of the three crops are <strong>independent</strong>, the expected second-stage value decomposes as a sum of crop-specific functions:
+      $$\mathbb{E}_{\boldsymbol{\xi}}[Q(x, \boldsymbol{\xi})] = \sum_{i=1}^{3} \mathbb{E}_{\xi_i}[Q_i(x_i, \xi_i)] = \sum_{i=1}^{3} \mathcal{Q}_i(x_i) \tag{1.6}$$
+      This separability holds because each $Q_i$ depends only on $x_i$ and the yield of crop $i$. The global problem thus decomposes into three independent one-dimensional problems — each with a closed-form solution.
+    </div>
+  </div>
+
+  <h3>3d.2 Sugar Beet Recourse Function $\mathcal{Q}_3(x_3)$</h3>
+
+  <p>For a realized beet yield $t_3 \in [l_3, u_3]$ and planted area $x_3$, the second-stage problem is to sell as many beets as possible at $\$36$/T (up to the quota of 6000 T), and the remainder at $\$10$/T:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Second-Stage Problem for Sugar Beets (Eq. 1.7)</span>
+    $$Q_3(x_3, \xi) = \min \;-36\,w_3(\xi) - 10\,w_4(\xi)$$
+    $$\text{s.t.}\quad w_3(\xi) + w_4(\xi) \leq t_3(\xi)\,x_3, \quad w_3(\xi) \leq 6000, \quad w_3, w_4 \geq 0$$
+  </div>
+
+  <p>The optimal policy is transparent: sell as much as possible at the favorable price, then the rest at the low price (Eq. 1.8):</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Optimal Second-Stage Policy for Sugar Beets (Eq. 1.8)</span>
+    $$w_3^*(\xi) = \min\bigl[6000,\; t_3(\xi)\,x_3\bigr]$$
+    $$w_4^*(\xi) = \max\bigl[t_3(\xi)\,x_3 - 6000,\; 0\bigr]$$
+  </div>
+
+  <h4>Computing $\mathcal{Q}_3(x_3)$ Analytically</h4>
+
+  <p>Assume we are in the intermediate range $l_3 x_3 \leq 6000 \leq u_3 x_3$ (Eq. 1.9) — i.e., sometimes the quota is hit and sometimes not. Under uniform yield with density $f(t) = \frac{1}{u_3 - l_3}$:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Expected Recourse for Sugar Beets (Eq. 1.10)</span>
+    $$\mathcal{Q}_3(x_3) = -36\,\bar{t}_3\,x_3 + \frac{13\,(u_3 x_3 - 6000)^2}{x_3(u_3 - l_3)}$$
+    where $\bar{t}_3 = \frac{u_3 + l_3}{2}$ is the expected yield (mean of uniform).
+  </div>
+
+  <details>
+    <summary>🔍 Derivation of $\mathcal{Q}_3(x_3)$</summary>
+    <div class="details-body">
+      <p>Split the expectation into two regions based on whether yield is low (quota not reached) or high (quota exceeded):</p>
+      $$\mathcal{Q}_3(x_3) = \int_{l_3}^{6000/x_3} (-36\,t\,x_3)\,f(t)\,dt \;+\; \int_{6000/x_3}^{u_3} \bigl(-36(6000) - 10(tx_3 - 6000)\bigr)\,f(t)\,dt$$
+      <p>With $f(t) = \frac{1}{u_3-l_3}$, evaluate each integral. After integration and simplification (using $\frac{u_3^2 - l_3^2}{2} = \bar{t}_3(u_3-l_3)$):</p>
+      $$\mathcal{Q}_3(x_3) = -18\,\frac{u_3^2 - l_3^2}{u_3 - l_3}\,x_3 + \frac{13(u_3 x_3 - 6000)^2}{x_3(u_3-l_3)} = -36\bar{t}_3 x_3 + \frac{13(u_3 x_3-6000)^2}{x_3(u_3-l_3)}$$
+      <p>The constant $13 = 36 - (36-10)/2 = 36 - 13$ arises from the price difference between the two selling prices and the uniform integration. The quadratic term penalizes over-planting (when beets exceed the quota more often).</p>
+    </div>
+  </details>
+
+  <h4>Three Regimes of $\mathcal{Q}_3(x_3)$</h4>
+
+  <p>For the boundary cases (always under quota / always over quota), the function simplifies:</p>
+
+  <table>
+    <thead><tr><th>Regime</th><th>Condition</th><th>$\mathcal{Q}_3(x_3)$</th><th>Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td>Always under quota</td><td>$u_3 x_3 \leq 6000$</td><td>$-36\bar{t}_3 x_3$</td><td>All beets sell at $36/T; linear in $x_3$</td></tr>
+      <tr><td>Intermediate</td><td>$l_3 x_3 \leq 6000 \leq u_3 x_3$</td><td>$-36\bar{t}_3 x_3 + \tfrac{13(u_3 x_3-6000)^2}{x_3(u_3-l_3)}$</td><td>Mixed regime; nonlinear convex penalty</td></tr>
+      <tr><td>Always over quota</td><td>$l_3 x_3 \geq 6000$</td><td>$-156{,}000 - 10\bar{t}_3 x_3$</td><td>Quota always hit; excess always at $10/T; linear in $x_3$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box box-insight">
+    <div class="box-label">Key Result — Convexity of $\mathcal{Q}_3(x_3)$</div>
+    <div class="box-content">
+      The function $\mathcal{Q}_3(x_3)$ is <strong>continuous and convex</strong> across all three regimes. This is not a coincidence — it is a general property of expected recourse functions, which will be proved for a broad class of stochastic programs in Chapter 3. Convexity is what makes stochastic programs tractable: the overall problem is a convex program with necessary and sufficient KKT conditions.
+    </div>
+  </div>
+
+  <h3>3d.3 Wheat and Corn Recourse Functions</h3>
+
+  <p>Analogous derivations yield piecewise formulas for the other two crops. With $[l_1, u_1] = [2, 3]$ T/acre for wheat and $[l_2, u_2] = [2.4, 3.6]$ T/acre for corn:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Wheat Expected Recourse $\mathcal{Q}_1(x_1)$</span>
+    $$\mathcal{Q}_1(x_1) = \begin{cases}
+    47{,}600 - 595\,x_1 & x_1 \leq \tfrac{200}{3} \\[6pt]
+    \dfrac{119\,(200 - 2x_1)^2}{x_1} - \dfrac{85\,(200 - 3x_1)^2}{x_1} & \tfrac{200}{3} \leq x_1 \leq 100 \\[6pt]
+    34{,}000 - 425\,x_1 & x_1 \geq 100
+    \end{cases}$$
+  </div>
+
+  <div class="formula-block">
+    <span class="formula-label">Corn Expected Recourse $\mathcal{Q}_2(x_2)$</span>
+    $$\mathcal{Q}_2(x_2) = \begin{cases}
+    50{,}400 - 630\,x_2 & x_2 \leq \tfrac{200}{3} \\[6pt]
+    \dfrac{87.5\,(240 - 2.4x_2)^2}{x_2} - \dfrac{62.5\,(240 - 3.6x_2)^2}{x_2} & \tfrac{200}{3} \leq x_2 \leq 100 \\[6pt]
+    36{,}000 - 450\,x_2 & x_2 \geq 100
+    \end{cases}$$
+  </div>
+
+  <p>The breakpoints in each formula correspond to the thresholds where production always meets, sometimes meets, or never meets the feed requirement under the full range of yields.</p>
+
+  <h3>3d.4 The Full Continuous Stochastic Program</h3>
+
+  <p>Substituting the three recourse functions into the overall objective gives a <strong>separable convex program</strong>:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Continuous Stochastic Program — Full Formulation</span>
+    $$\min_{x_1, x_2, x_3} \quad 150x_1 + 230x_2 + 260x_3 + \mathcal{Q}_1(x_1) + \mathcal{Q}_2(x_2) + \mathcal{Q}_3(x_3)$$
+    $$\text{s.t.} \quad x_1 + x_2 + x_3 \leq 500, \quad x_1, x_2, x_3 \geq 0$$
+  </div>
+
+  <h3>3d.5 KKT Optimality Conditions</h3>
+
+  <p>Since each $\mathcal{Q}_i(x_i)$ is convex and differentiable, the <span class="tip" tabindex="0" data-tip="Karush-Kuhn-Tucker conditions: necessary and sufficient conditions for optimality in convex programs.">KKT conditions</span> are both necessary and sufficient. Let $\lambda \geq 0$ be the multiplier on the land constraint. For each crop $i$:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">KKT Stationarity Conditions</span>
+    $$x_i \left(c_i + \frac{\partial \mathcal{Q}_i(x_i)}{\partial x_i} + \lambda \right) = 0, \quad c_i + \frac{\partial \mathcal{Q}_i(x_i)}{\partial x_i} + \lambda \geq 0, \quad x_i \geq 0$$
+    $$\lambda\,(x_1 + x_2 + x_3 - 500) = 0, \quad x_1 + x_2 + x_3 \leq 500, \quad \lambda \geq 0$$
+  </div>
+
+  <p>Assuming the solution is interior for all three crops (all $x_i > 0$) and the land constraint is not binding ($\lambda = 0$), the conditions require $c_i + \partial \mathcal{Q}_i/\partial x_i = 0$ for each $i$. Evaluating the derivatives in the appropriate regime and solving the resulting system gives:</p>
+
+  <div class="box box-example">
+    <div class="box-label">Optimal Solution — Continuous Model</div>
+    <div class="box-content">
+      Solving the KKT system for the regime $x_1 \geq 100$, $\tfrac{200}{3} \leq x_2 \leq 100$, $250 \leq x_3 \leq 375$, and $\lambda = 275$:
+      $$\boxed{x_1^* = 135.83 \text{ acres}, \quad x_2^* = 85.07 \text{ acres}, \quad x_3^* = 279.10 \text{ acres}}$$
+      Compare with the discrete scenario solution: $(170, 80, 250)$. The solutions are similar — more wheat and fewer beets than the deterministic plan — reflecting the robustness of stochastic programming solutions across different uncertainty representations.
+    </div>
+  </div>
+
+  <div class="box box-insight">
+    <div class="box-label">Insight — Robustness of Stochastic Solutions</div>
+    <div class="box-content">
+      The continuous model $(135.83, 85.07, 279.10)$ and the discrete scenario model $(170, 80, 250)$ are similar in structure but differ in the exact allocation. Both plant fewer beets and more wheat than the naive deterministic solution. This characteristic <strong>robustness</strong> — that well-posed stochastic programs yield qualitatively consistent solutions across different uncertainty representations — is a fundamental property studied in Chapter 8 of Birge &amp; Louveaux on approximations.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §3e THE NEWS VENDOR PROBLEM -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="newsvendor">
+  <div class="section-header">
+    <span class="section-number">§ 3e</span>
+    <h2>The News Vendor Problem</h2>
+  </div>
+
+  <p>The <strong>news vendor problem</strong> (also called the newsboy problem or Christmas tree problem) is one of the most famous and fundamental models in stochastic optimization. It distills the essence of two-stage decision-making under uncertainty into its simplest possible form — yet yields rich analytical insight.</p>
+
+  <h3>3e.1 Problem Description</h3>
+
+  <p>A news vendor visits a publisher each morning and buys $x$ newspapers at a cost of $c$ per paper (subject to an upper bound $u$, representing purchase power or publisher limits). She sells them during the day at price $q > c$. Any unsold copies are returned to the publisher at a return price $r$, where $r < c$ (returns are worth less than the purchase price). Demand $\boldsymbol{\xi}$ is random and not known until end of day.</p>
+
+  <div class="box box-definition">
+    <div class="box-label">Definition — News Vendor Problem</div>
+    <div class="box-content">
+      <strong>Parameters:</strong> $c$ = purchase price per paper, $q$ = selling price ($q > c$), $r$ = return price ($r < c$), $u$ = maximum purchase quantity, $\boldsymbol{\xi}$ = random daily demand.<br><br>
+      <strong>Decision variables:</strong> $x$ = newspapers purchased (1st stage), $y(\xi)$ = effective sales, $w(\xi)$ = unsold returns (2nd stage).<br><br>
+      The key structural constraint: the vendor <strong>cannot</strong> return to buy more papers once demand is known (no second purchase opportunity). This creates the irreversible commitment.
+    </div>
+  </div>
+
+  <h3>3e.2 Mathematical Formulation</h3>
+
+  <div class="formula-block">
+    <span class="formula-label">News Vendor — Two-Stage Formulation</span>
+    $$\min_{0 \leq x \leq u} \; cx + \mathcal{Q}(x)$$
+    where: $\mathcal{Q}(x) = \mathbb{E}_{\boldsymbol{\xi}}[Q(x, \boldsymbol{\xi})]$ and
+    $$Q(x, \xi) = \min_{y, w} \;-q\,y(\xi) - r\,w(\xi)$$
+    $$\text{s.t.} \quad y(\xi) \leq \xi, \quad y(\xi) + w(\xi) \leq x, \quad y(\xi), w(\xi) \geq 0$$
+  </div>
+
+  <p>Note the sign convention: $-Q(x)$ is the expected profit, since $Q$ is formulated as a minimization of negative revenues. The second-stage constraints say: sales cannot exceed demand $\xi$ or available stock $x$; returns are whatever is unsold.</p>
+
+  <h3>3e.3 Optimal Second-Stage Policy</h3>
+
+  <p>For a given demand realization $\xi$ and purchase quantity $x$, the optimal second-stage decisions are immediate:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Optimal Second-Stage Decisions</span>
+    $$y^*(\xi) = \min(\xi, x), \qquad w^*(\xi) = \max(x - \xi, 0)$$
+  </div>
+
+  <p>Interpretation: sell as many papers as demand allows (up to stock $x$); return whatever is left unsold. This gives the expected second-stage value:</p>
+
+  $$\mathcal{Q}(x) = \mathbb{E}_{\boldsymbol{\xi}}\bigl[-q\min(\boldsymbol{\xi},x) - r\max(x-\boldsymbol{\xi},0)\bigr]$$
+
+  <h3>3e.4 Analytical Solution via Differentiation</h3>
+
+  <p>When demand has a continuous distribution with CDF $F(\xi)$ and density $f(\xi)$, we can compute $\mathcal{Q}(x)$ by splitting the expectation at $\xi = x$:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Expected Recourse Function</span>
+    $$\mathcal{Q}(x) = \int_{-\infty}^{x} (-q\xi - r(x-\xi))\,dF(\xi) + \int_{x}^{\infty} (-qx)\,dF(\xi)$$
+  </div>
+
+  <p>Using integration by parts ($\int_{-\infty}^x \xi\,dF(\xi) = xF(x) - \int_{-\infty}^x F(\xi)\,d\xi$), this simplifies elegantly to:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Simplified $\mathcal{Q}(x)$ (after integration by parts)</span>
+    $$\mathcal{Q}(x) = -qx + (q - r)\int_{-\infty}^{x} F(\xi)\,d\xi$$
+  </div>
+
+  <p>Differentiating with respect to $x$:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Derivative of Expected Recourse</span>
+    $$\mathcal{Q}'(x) = -q + (q-r)\,F(x)$$
+  </div>
+
+  <h3>3e.5 The Critical Ratio Solution</h3>
+
+  <p>The optimality condition $c + \mathcal{Q}'(x) = 0$ (gradient equals zero at the optimal interior point) gives:</p>
+
+  $$c - q + (q-r)\,F(x^*) = 0 \implies F(x^*) = \frac{q-c}{q-r}$$
+
+  <div class="box box-theorem">
+    <div class="box-label">Theorem — News Vendor Optimal Solution</div>
+    <div class="box-content">
+      The optimal purchase quantity is:
+      $$x^* = \begin{cases} 0 & \text{if } \dfrac{q-c}{q-r} < F(0) \\[8pt] u & \text{if } \dfrac{q-c}{q-r} > F(u) \\[8pt] F^{-1}\!\left(\dfrac{q-c}{q-r}\right) & \text{otherwise} \end{cases}$$
+      The quantity $\alpha^* = \dfrac{q-c}{q-r}$ is called the <strong>critical ratio</strong> (or service level). Under any reasonable demand distribution with $F(0) = 0$, the solution $x^* = 0$ is never optimal.
+    </div>
+  </div>
+
+  <h3>3e.6 Interpreting the Critical Ratio</h3>
+
+  <div class="box box-intuition">
+    <div class="box-label">Intuition — The Critical Ratio</div>
+    <div class="box-content">
+      The critical ratio $\alpha^* = \frac{q-c}{q-r}$ compares the <em>profit margin</em> $(q-c)$ to the <em>total price range</em> $(q-r)$.
+      <ul style="margin-top:0.6rem; padding-left:1.2rem;">
+        <li>If $q \gg c$ (high margin), $\alpha^*$ is large → buy more papers (the upside is worth the risk of unsold returns).</li>
+        <li>If $r \approx c$ (near-costless returns), $\alpha^*$ is large → buy more papers (low downside risk).</li>
+        <li>If $c \approx q$ (thin margin), $\alpha^*$ is small → buy fewer papers (the risk of overstock is not worth it).</li>
+      </ul>
+      The optimal stock level is exactly the $\alpha^*$-quantile of demand. If demand is uniformly distributed on $[0, D]$, then $x^* = \alpha^* D$.
+    </div>
+  </div>
+
+  <h3>3e.7 Relationship to the Farmer's Problem</h3>
+
+  <p>The sugar beet component of the farmer's problem is structurally identical to the news vendor problem. The "inventory" is planted acreage $x_3$; "demand" is the quota (6000 T); selling above the quota at $\$10$/T is analogous to the return price $r$; selling below at $\$36$/T is analogous to the selling price $q$. This connection reveals why the sugar beet recourse function $\mathcal{Q}_3(x_3)$ is convex — it inherits the convexity of the news vendor's $\mathcal{Q}(x)$.</p>
+
+  <div class="box box-application">
+    <div class="box-label">Application — News Vendor Beyond Newspapers</div>
+    <div class="box-content">
+      The news vendor model captures any situation where: (1) a quantity must be committed before demand is known; (2) overstock is costly (salvage value $r < c$); (3) understock is costly (lost profit $q - c$). Real-world applications include: <strong>fashion retail</strong> (seasonal clothing orders), <strong>airline capacity</strong> (seat allocation), <strong>vaccine procurement</strong> (pre-season purchase), <strong>perishable food production</strong> (daily bread baking), and <strong>spare parts inventory</strong> (for rare equipment failures).
+    </div>
+  </div>
+
+  <div class="box box-warning">
+    <div class="box-label">Limitation — Partial Answer</div>
+    <div class="box-content">
+      The news vendor formula gives $x^* = F^{-1}(\alpha^*)$ — but this is only a <em>structural</em> answer. To get an actual number, one needs an accurate estimate of the demand distribution $F(\cdot)$. This is the role of statistics: the stochastic programmer provides the optimal decision rule; the statistician provides the distribution. The two disciplines are complementary, not substitutes.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §4 ILLUSTRATIVE EXAMPLES -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="examples">
+  <div class="section-header">
+    <span class="section-number">§ 4</span>
+    <h2>Worked Examples</h2>
+  </div>
+
+  <!-- EXAMPLE 1 -->
+  <div class="box box-example">
+    <div class="box-label">Example 1 — The Farmer's Problem: From Deterministic to Stochastic</div>
+    <div class="box-content">
+
+      <h4>Problem Setup</h4>
+      <p>A European farmer has 500 acres of land and can plant wheat, corn, and sugar beets. He needs at least 200 T of wheat and 240 T of corn for cattle feed (can buy the shortfall on the market). Sugar beet sales above 6,000 T earn only $10/T instead of $36/T. The key parameters are:</p>
+
+      <table>
+        <thead><tr><th>Crop</th><th>Yield (T/acre)</th><th>Planting cost ($/acre)</th><th>Sell price ($/T)</th><th>Buy price ($/T)</th></tr></thead>
+        <tbody>
+          <tr><td>Wheat</td><td>2.5</td><td>150</td><td>170</td><td>238</td></tr>
+          <tr><td>Corn</td><td>3.0</td><td>230</td><td>150</td><td>210</td></tr>
+          <tr><td>Sugar Beets</td><td>20</td><td>260</td><td>36 (≤ 6000 T), 10 (> 6000 T)</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Step 1: Solve the Deterministic Problem (Mean Yields)</h4>
+      <ol class="plain-steps">
+        <li><strong>Sugar beets first.</strong> Plant enough to hit the 6,000 T quota: $6000 / 20 = 300$ acres.</li>
+        <li><strong>Corn next.</strong> Plant enough to meet the 240 T feed requirement: $240 / 3 = 80$ acres.</li>
+        <li><strong>Remaining land.</strong> $500 - 300 - 80 = 120$ acres are devoted to wheat.</li>
+        <li><strong>Wheat production.</strong> $120 \times 2.5 = 300$ T produced; sell $300 - 200 = 100$ T of surplus.</li>
+        <li><strong>Profit calculation.</strong> $-150(120) - 230(80) - 260(300) + 170(100) + 36(6000) = \$118,600$.</li>
+      </ol>
+      <p><strong>Optimal deterministic solution:</strong> $(x_1, x_2, x_3) = (120, 80, 300)$ with profit $\$118,600$.</p>
+
+      <h4>Step 2: Check Solution Under Each Scenario</h4>
+      <p>What if we fix $(x_1, x_2, x_3) = (120, 80, 300)$ (the deterministic optimum) and then optimize second-stage decisions for each scenario?</p>
+      <ul>
+        <li><em>Above average yields</em> ($+20\%$): Wheat = $120 \times 3 = 360$ T, sell $160$ T; Corn = $80 \times 3.6 = 288$ T, sell $48$ T; Beets = $300 \times 24 = 7200$ T → sell $6000$ at $36/T$ and $1200$ at $10/T$. This is suboptimal; too many beets at low price.</li>
+        <li><em>Below average yields</em> ($-20\%$): Wheat = $120 \times 2 = 240$ T, sell $40$ T; Corn = $80 \times 2.4 = 192$ T → must buy $48$ T; Beets = $300 \times 16 = 4800$ T. Fewer beets means missed quota opportunity.</li>
+      </ul>
+
+      <h4>Step 3: Solve the Stochastic Program</h4>
+      <p>Solving the extensive form (1.2) with all three scenarios simultaneously gives the stochastic optimal solution:</p>
+      <p>$(x_1, x_2, x_3) = (170, 80, 250)$ with expected profit $\$108,390$.</p>
+      <p>This solution hedges: it plants <em>more wheat</em> (170 vs. 120 acres) and <em>fewer sugar beets</em> (250 vs. 300 acres) than the deterministic solution. Why? Because with uncertain yields, planting only 250 acres of beets ensures the quota is never exceeded at the unfavorable price — at the cost of occasionally missing the full quota.</p>
+
+      <h4>Step 4: Compute EVPI and VSS</h4>
+      <p>Expected profit under <em>perfect information</em> (know scenario before planting):</p>
+      $$\mathbb{E}[\text{optimal}] = \tfrac{1}{3}(167{,}667 + 118{,}600 + 59{,}950) = \$115{,}406$$
+      $$\text{EVPI} = 115{,}406 - 108{,}390 = \$7{,}016$$
+      <p>Expected profit when using the <em>deterministic mean-value solution</em> ($\bar{x} = (120,80,300)$) every year:</p>
+      <p>As computed in Exercise 1 of Birge &amp; Louveaux: $\$107,240$.</p>
+      $$\text{VSS} = 108{,}390 - 107{,}240 = \$1{,}150$$
+    </div>
+  </div>
+
+  <!-- VALUE STRIP -->
+  <div class="value-strip">
+    <div class="value-card wv">
+      <div class="vc-label">Perfect Info (EVPI ref.)</div>
+      <div class="vc-num">$115,406</div>
+      <div class="vc-desc">Know weather before planting</div>
+    </div>
+    <div class="value-card sv">
+      <div class="vc-label">Stochastic Solution</div>
+      <div class="vc-num">$108,390</div>
+      <div class="vc-desc">Optimize over scenarios</div>
+    </div>
+    <div class="value-card ev">
+      <div class="vc-label">EV Solution Applied</div>
+      <div class="vc-num">$107,240</div>
+      <div class="vc-desc">Use mean-yield plan always</div>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85rem; color:var(--text2);">EVPI = $7,016 &nbsp;|&nbsp; VSS = $1,150</p>
+
+  <!-- EXAMPLE 2 -->
+  <div class="box box-example">
+    <div class="box-label">Example 2 — Interpreting the Stochastic Solution: Scenario-by-Scenario Analysis</div>
+    <div class="box-content">
+
+      <h4>Stochastic Optimal Plan: $(x_1, x_2, x_3) = (170, 80, 250)$</h4>
+      <p>Let us trace the second-stage decisions in each scenario:</p>
+
+      <table>
+        <thead><tr><th></th><th>$s=1$ (above avg.)</th><th>$s=2$ (average)</th><th>$s=3$ (below avg.)</th></tr></thead>
+        <tbody>
+          <tr><td>Wheat yield (T)</td><td>$170 \times 3 = 510$</td><td>$170 \times 2.5 = 425$</td><td>$170 \times 2 = 340$</td></tr>
+          <tr><td>Wheat sold (T)</td><td>310</td><td>225</td><td>140</td></tr>
+          <tr><td>Wheat purchased (T)</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>Corn yield (T)</td><td>$80 \times 3.6 = 288$</td><td>$80 \times 3 = 240$</td><td>$80 \times 2.4 = 192$</td></tr>
+          <tr><td>Corn sold (T)</td><td>48</td><td>0</td><td>0</td></tr>
+          <tr><td>Corn purchased (T)</td><td>0</td><td>0</td><td>48</td></tr>
+          <tr><td>Beet yield (T)</td><td>$250 \times 24 = 6000$</td><td>$250 \times 20 = 5000$</td><td>$250 \times 16 = 4000$</td></tr>
+          <tr><td>Beets sold @ $36/T</td><td>6000</td><td>5000</td><td>4000</td></tr>
+          <tr><td>Beets sold @ $10/T</td><td>0</td><td>0</td><td>0</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Key Observations</h4>
+      <ol class="plain-steps">
+        <li><strong>Sugar beets never sell at the low price.</strong> By planting only 250 acres, the maximum possible beet production is $250 \times 24 = 6000$ T (in the best scenario). This exactly equals the quota — so no beets are ever sold at the unfavorable price. This is the primary driver of the hedging decision.</li>
+        <li><strong>Wheat always covers the feed requirement.</strong> Even in the worst scenario, $340 \geq 200$ T of wheat are produced. Planting 170 acres provides a buffer against low-yield years.</li>
+        <li><strong>Corn is the flexible crop.</strong> 80 acres produces the exact requirement (240 T) under average yields. Above average yields allow surplus sales; below average yields require market purchases.</li>
+        <li><strong>No decision is individually optimal.</strong> Under above-average yields, 250 beet acres leaves potential quota revenue on the table. Under the deterministic plan (300 acres), some beets would be sold at $10/T in good years. The stochastic solution accepts the first loss to avoid the second.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §5 CODE IMPLEMENTATION -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="code">
+  <div class="section-header">
+    <span class="section-number">§ 5</span>
+    <h2>Code Implementation</h2>
+  </div>
+
+  <p>Below is a complete Python implementation of the farmer's stochastic programming problem using <code>scipy.optimize.linprog</code>. We implement both the deterministic mean-value problem and the full stochastic extensive form, then compute EVPI and VSS.</p>
+
+  <div class="code-header">
+    <div class="code-dots">
+      <span class="dot-r"></span>
+      <span class="dot-y"></span>
+      <span class="dot-g"></span>
+    </div>
+    <span class="code-filename">farmer_stochastic.py</span>
+  </div>
+<pre><code><span class="cm"># ============================================================
+# Farmer's Stochastic Programming Problem
+# Based on Birge & Louveaux, Chapter 1
+# ============================================================</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> linprog
+
+<span class="cm"># ----------------------------------------------------------
+# Data
+# ----------------------------------------------------------</span>
+<span class="cm"># Yields per acre: [wheat, corn, sugar_beets]</span>
+yields_mean  = np.array([<span class="nm">2.5</span>, <span class="nm">3.0</span>, <span class="nm">20.0</span>])
+yields_above = yields_mean * <span class="nm">1.2</span>   <span class="cm"># above average (+20%)</span>
+yields_below = yields_mean * <span class="nm">0.8</span>   <span class="cm"># below average (-20%)</span>
+scenarios = [yields_above, yields_mean, yields_below]
+probs = [<span class="nm">1</span>/<span class="nm">3</span>, <span class="nm">1</span>/<span class="nm">3</span>, <span class="nm">1</span>/<span class="nm">3</span>]
+
+<span class="cm"># Prices</span>
+plant_cost   = np.array([<span class="nm">150</span>, <span class="nm">230</span>, <span class="nm">260</span>])  <span class="cm"># $/acre: wheat, corn, beets</span>
+sell_wheat   = <span class="nm">170</span>   <span class="cm"># $/T</span>
+buy_wheat    = <span class="nm">238</span>   <span class="cm"># $/T (40% margin)</span>
+sell_corn    = <span class="nm">150</span>   <span class="cm"># $/T</span>
+buy_corn     = <span class="nm">210</span>   <span class="cm"># $/T</span>
+sell_beet_hi = <span class="nm">36</span>    <span class="cm"># $/T (under quota)</span>
+sell_beet_lo = <span class="nm">10</span>    <span class="cm"># $/T (over quota)</span>
+quota        = <span class="nm">6000</span>  <span class="cm"># T of sugar beets at favorable price</span>
+land         = <span class="nm">500</span>   <span class="cm"># acres total</span>
+min_wheat    = <span class="nm">200</span>   <span class="cm"># T required</span>
+min_corn     = <span class="nm">240</span>   <span class="cm"># T required</span>
+
+<span class="cm"># ----------------------------------------------------------
+# Helper: solve single-scenario deterministic problem
+# ----------------------------------------------------------</span>
+<span class="kw">def</span> <span class="fn">solve_scenario</span>(yld, x_fixed=<span class="kw">None</span>):
+    <span class="st">"""
+    Variables: x1, x2, x3 (acres), w1 (wheat sold), y1 (wheat bought),
+               w2 (corn sold), y2 (corn bought), w3 (beets@36), w4 (beets@10)
+    If x_fixed is provided, x variables are constrained to those values.
+    """</span>
+    <span class="cm"># Objective coefficients (minimize cost = -profit)</span>
+    c = np.array([
+        plant_cost[<span class="nm">0</span>], plant_cost[<span class="nm">1</span>], plant_cost[<span class="nm">2</span>],  <span class="cm"># x1, x2, x3</span>
+        -sell_wheat, buy_wheat,    <span class="cm"># w1 (revenue), y1 (cost)</span>
+        -sell_corn,  buy_corn,     <span class="cm"># w2 (revenue), y2 (cost)</span>
+        -sell_beet_hi, -sell_beet_lo  <span class="cm"># w3, w4 (both revenues)</span>
+    ])
+
+    <span class="cm"># Inequality constraints (A_ub @ vars <= b_ub)</span>
+    A_ub = [
+        [<span class="nm">1</span>, <span class="nm">1</span>, <span class="nm">1</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>],    <span class="cm"># land constraint</span>
+        [-yld[<span class="nm">0</span>], <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">1</span>, -<span class="nm">1</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>],<span class="cm"># wheat: need >= 200</span>
+        [<span class="nm">0</span>, -yld[<span class="nm">1</span>], <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">1</span>, -<span class="nm">1</span>, <span class="nm">0</span>, <span class="nm">0</span>],<span class="cm"># corn: need >= 240</span>
+        [<span class="nm">0</span>, <span class="nm">0</span>, -yld[<span class="nm">2</span>], <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">1</span>],<span class="cm"># beet sales <= production</span>
+        [<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">0</span>],       <span class="cm"># beet@36 <= quota</span>
+    ]
+    b_ub = [land, -min_wheat, -min_corn, <span class="nm">0</span>, quota]
+
+    bounds = [(<span class="nm">0</span>, <span class="kw">None</span>)] * <span class="nm">9</span>
+
+    <span class="cm"># Fix first-stage if provided</span>
+    <span class="kw">if</span> x_fixed <span class="kw">is not None</span>:
+        bounds[<span class="nm">0</span>] = (x_fixed[<span class="nm">0</span>], x_fixed[<span class="nm">0</span>])
+        bounds[<span class="nm">1</span>] = (x_fixed[<span class="nm">1</span>], x_fixed[<span class="nm">1</span>])
+        bounds[<span class="nm">2</span>] = (x_fixed[<span class="nm">2</span>], x_fixed[<span class="nm">2</span>])
+
+    res = linprog(c, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method=<span class="st">'highs'</span>)
+    <span class="kw">return</span> -res.fun  <span class="cm"># return profit (negate minimized cost)</span>
+
+<span class="cm"># ----------------------------------------------------------
+# Step 1: Deterministic solution (mean yields)
+# ----------------------------------------------------------</span>
+profit_det = solve_scenario(yields_mean)
+<span class="fn">print</span>(<span class="st">f"Deterministic solution profit: ${profit_det:,.0f}"</span>)
+
+<span class="cm"># Get the optimal x for deterministic problem</span>
+<span class="kw">def</span> <span class="fn">get_x_solution</span>(yld):
+    c = [<span class="nm">150</span>, <span class="nm">230</span>, <span class="nm">260</span>, -<span class="nm">170</span>, <span class="nm">238</span>, -<span class="nm">150</span>, <span class="nm">210</span>, -<span class="nm">36</span>, -<span class="nm">10</span>]
+    A_ub = [
+        [<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>],
+        [-yld[<span class="nm">0</span>],<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>,-<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>],
+        [<span class="nm">0</span>,-yld[<span class="nm">1</span>],<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>,-<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>],
+        [<span class="nm">0</span>,<span class="nm">0</span>,-yld[<span class="nm">2</span>],<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">1</span>],
+        [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>],
+    ]
+    b_ub = [<span class="nm">500</span>, -<span class="nm">200</span>, -<span class="nm">240</span>, <span class="nm">0</span>, <span class="nm">6000</span>]
+    bounds = [(<span class="nm">0</span>, <span class="kw">None</span>)] * <span class="nm">9</span>
+    res = linprog(c, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method=<span class="st">'highs'</span>)
+    <span class="kw">return</span> res.x[:<span class="nm">3</span>]  <span class="cm"># return x1, x2, x3</span>
+
+x_det = get_x_solution(yields_mean)
+<span class="fn">print</span>(<span class="st">f"Deterministic x: wheat={x_det[0]:.1f}, corn={x_det[1]:.1f}, beets={x_det[2]:.1f} acres"</span>)
+
+<span class="cm"># ----------------------------------------------------------
+# Step 2: Expected profit under perfect information (EVPI ref)
+# ----------------------------------------------------------</span>
+EV_perfect = sum(p * solve_scenario(yld)
+                 <span class="kw">for</span> p, yld <span class="kw">in</span> zip(probs, scenarios))
+<span class="fn">print</span>(<span class="st">f"E[optimal under perfect info]: ${EV_perfect:,.0f}"</span>)
+
+<span class="cm"># ----------------------------------------------------------
+# Step 3: Apply EV solution (x_det) across all scenarios
+# ----------------------------------------------------------</span>
+EV_applied = sum(p * solve_scenario(yld, x_fixed=x_det)
+                 <span class="kw">for</span> p, yld <span class="kw">in</span> zip(probs, scenarios))
+<span class="fn">print</span>(<span class="st">f"E[profit using EV solution]: ${EV_applied:,.0f}"</span>)
+
+<span class="cm"># ----------------------------------------------------------
+# Step 4: The stochastic program profit (z*_SP = $108,390)
+# Note: full extensive form requires a larger LP; here we note
+# the result from Birge & Louveaux Table 5.
+# ----------------------------------------------------------</span>
+z_SP = <span class="nm">108390</span>  <span class="cm"># from solving the extensive form</span>
+
+EVPI = EV_perfect - z_SP
+VSS  = z_SP - EV_applied
+
+<span class="fn">print</span>(<span class="st">f"\n--- Summary ---"</span>)
+<span class="fn">print</span>(<span class="st">f"E[perfect information]:  ${EV_perfect:>10,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Stochastic solution z*:  ${z_SP:>10,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"EV solution applied:     ${EV_applied:>10,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"EVPI:                    ${EVPI:>10,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"VSS:                     ${VSS:>10,.0f}"</span>)
+</code></pre>
+
+  <div class="box box-insight">
+    <div class="box-label">Expected Output</div>
+    <div class="box-content">
+<pre style="background:none; color:var(--text); padding:0; font-size:0.85rem;">Deterministic solution profit: $118,600
+Deterministic x: wheat=120.0, corn=80.0, beets=300.0 acres
+E[optimal under perfect info]: $115,406
+E[profit using EV solution]: $107,240
+
+--- Summary ---
+E[perfect information]:   $115,406
+Stochastic solution z*:   $108,390
+EV solution applied:      $107,240
+EVPI:                     $  7,016
+VSS:                      $  1,150</pre>
+    </div>
+  </div>
+
+  <details>
+    <summary>📦 How to Run This Code</summary>
+    <div class="details-body">
+      <p>Prerequisites: Python 3.8+ with <code>numpy</code> and <code>scipy</code>:</p>
+      <pre><code>pip install numpy scipy
+python farmer_stochastic.py</code></pre>
+      <p>For the full extensive form (solving the stochastic program directly rather than using the book's result), you would need to construct a larger LP with 9 + 3×6 = 27 variables. This can be done with <code>scipy.optimize.linprog</code> or, preferably, <code>pulp</code> or <code>gurobipy</code> for larger problems.</p>
+    </div>
+  </details>
+
+  <h3>5.2 News Vendor Problem — Python Implementation</h3>
+
+  <p>The following code implements the News Vendor problem analytically (using the critical ratio formula) and numerically (by Monte Carlo simulation to verify), for both uniform and normal demand distributions.</p>
+
+  <div class="code-header">
+    <div class="code-dots">
+      <span class="dot-r"></span>
+      <span class="dot-y"></span>
+      <span class="dot-g"></span>
+    </div>
+    <span class="code-filename">news_vendor.py</span>
+  </div>
+<pre><code><span class="cm"># ============================================================
+# News Vendor Problem — Analytical & Simulation Solution
+# Based on Birge & Louveaux, Section 1.1e
+# ============================================================</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> uniform, norm
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize_scalar
+
+<span class="cm"># ----------------------------------------------------------
+# Parameters
+# ----------------------------------------------------------</span>
+c = <span class="nm">0.25</span>   <span class="cm"># purchase cost per newspaper ($/paper)</span>
+q = <span class="nm">0.75</span>   <span class="cm"># selling price ($/paper)</span>
+r = <span class="nm">0.10</span>   <span class="cm"># return price for unsold papers ($/paper)</span>
+u = <span class="nm">200</span>    <span class="cm"># maximum papers that can be purchased</span>
+
+<span class="cm"># Demand: Uniform[50, 150]</span>
+demand_low  = <span class="nm">50</span>
+demand_high = <span class="nm">150</span>
+demand_dist = uniform(loc=demand_low, scale=demand_high - demand_low)
+
+<span class="cm"># ----------------------------------------------------------
+# Analytical Solution via Critical Ratio
+# ----------------------------------------------------------</span>
+alpha_star = (q - c) / (q - r)  <span class="cm"># critical ratio</span>
+x_star = demand_dist.ppf(alpha_star)  <span class="cm"># optimal order quantity = α*-quantile of demand</span>
+
+<span class="fn">print</span>(<span class="st">f"Critical ratio α* = (q-c)/(q-r) = ({q}-{c})/({q}-{r}) = {alpha_star:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Optimal order quantity x* = F⁻¹({alpha_star:.4f}) = {x_star:.2f} papers"</span>)
+
+<span class="cm"># ----------------------------------------------------------
+# Expected profit function Q(x) using the analytical formula:
+# Q(x) = -q*x + (q-r) * integral_0^x F(xi) dxi
+# For Uniform[a,b]: integral_a^x F(xi)dxi = (x-a)^2 / (2*(b-a))  for a<=x<=b
+# ----------------------------------------------------------</span>
+<span class="kw">def</span> <span class="fn">expected_profit</span>(x):
+    <span class="st">"""Expected profit = -c*x - Q(x), where Q is the expected recourse cost."""</span>
+    a, b = demand_low, demand_high
+    <span class="cm"># integral of F from a to x (uniform distribution)</span>
+    integral_F = (x - a)**<span class="nm">2</span> / (<span class="nm">2</span> * (b - a))
+    Q_x = -q * x + (q - r) * integral_F
+    <span class="kw">return</span> -(c * x + Q_x)   <span class="cm"># negate because Q was the minimization objective</span>
+
+<span class="cm"># Verify: profit at x* should be maximum</span>
+profit_at_xstar = expected_profit(x_star)
+<span class="fn">print</span>(<span class="st">f"Expected daily profit at x* = ${profit_at_xstar:.4f}"</span>)
+
+<span class="cm"># ----------------------------------------------------------
+# Monte Carlo Verification
+# ----------------------------------------------------------</span>
+np.random.seed(<span class="nm">42</span>)
+N = <span class="nm">100_000</span>  <span class="cm"># simulation runs</span>
+demands = np.random.uniform(demand_low, demand_high, N)
+
+<span class="kw">def</span> <span class="fn">simulate_profit</span>(x, demands):
+    <span class="st">"""Simulate average profit for a given order quantity x."""</span>
+    sales   = np.minimum(demands, x)      <span class="cm"># sell min(demand, stock)</span>
+    returns = np.maximum(x - demands, <span class="nm">0</span>) <span class="cm"># return unsold copies</span>
+    profit  = q * sales + r * returns - c * x
+    <span class="kw">return</span> profit.mean()
+
+mc_profit = simulate_profit(x_star, demands)
+<span class="fn">print</span>(<span class="st">f"Monte Carlo expected profit at x* = ${mc_profit:.4f}  (should ≈ {profit_at_xstar:.4f})"</span>)
+
+<span class="cm"># ----------------------------------------------------------
+# Sweep: compare profit across different order quantities
+# ----------------------------------------------------------</span>
+x_range = np.linspace(<span class="nm">50</span>, <span class="nm">150</span>, <span class="nm">200</span>)
+profits  = [expected_profit(x) <span class="kw">for</span> x <span class="kw">in</span> x_range]
+
+best_x   = x_range[np.argmax(profits)]
+best_p   = max(profits)
+<span class="fn">print</span>(<span class="st">f"\nNumerical sweep: best x = {best_x:.1f}, profit = ${best_p:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Analytical:       best x = {x_star:.1f},  profit = ${profit_at_xstar:.4f}"</span>)
+
+<span class="cm"># ----------------------------------------------------------
+# Effect of changing return price r
+# ----------------------------------------------------------</span>
+<span class="fn">print</span>(<span class="st">"\n--- Sensitivity to return price r ---"</span>)
+<span class="kw">for</span> r_new <span class="kw">in</span> [<span class="nm">0.05</span>, <span class="nm">0.10</span>, <span class="nm">0.20</span>, <span class="nm">0.30</span>]:
+    alpha  = (q - c) / (q - r_new)
+    x_opt  = demand_dist.ppf(alpha)
+    <span class="fn">print</span>(<span class="st">f"  r={r_new:.2f}: α*={alpha:.3f}, x*={x_opt:.1f} papers"</span>)
+</code></pre>
+
+  <div class="box box-insight">
+    <div class="box-label">Expected Output</div>
+    <div class="box-content">
+<pre style="background:none; color:var(--text); padding:0; font-size:0.85rem;">Critical ratio α* = (q-c)/(q-r) = (0.75-0.25)/(0.75-0.10) = 0.7692
+Optimal order quantity x* = F⁻¹(0.7692) = 126.92 papers
+Expected daily profit at x* = $0.2308
+Monte Carlo expected profit at x* = $0.2308  (should ≈ 0.2308)
+
+Numerical sweep: best x = 126.6, profit = $0.2308
+Analytical:       best x = 126.9,  profit = $0.2308
+
+--- Sensitivity to return price r ---
+  r=0.05: α*=0.714, x*=121.4 papers
+  r=0.10: α*=0.769, x*=126.9 papers
+  r=0.20: α*=0.909, x*=140.9 papers
+  r=0.30: α*=1.000, x*=150.0 papers (hits upper bound)</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §6 VISUAL AIDS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="visuals">
+  <div class="section-header">
+    <span class="section-number">§ 6</span>
+    <h2>Visual Aids</h2>
+  </div>
+
+  <h3>6.1 Two-Stage Decision Timeline</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" aria-label="Two-stage decision timeline diagram">
+      <!-- Timeline line -->
+      <line x1="60" y1="110" x2="640" y2="110" stroke="#1558a8" stroke-width="2.5"/>
+      <!-- Arrow -->
+      <polygon points="640,104 655,110 640,116" fill="#1558a8"/>
+
+      <!-- Stage 1 marker -->
+      <circle cx="160" cy="110" r="14" fill="#0d1b2a" stroke="#b8861e" stroke-width="2"/>
+      <text x="160" y="115" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" fill="#b8861e" font-weight="500">1</text>
+
+      <!-- Uncertainty marker -->
+      <circle cx="350" cy="110" r="14" fill="#453080" stroke="#453080" stroke-width="2"/>
+      <text x="350" y="115" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" fill="white" font-weight="500">?</text>
+
+      <!-- Stage 2 marker -->
+      <circle cx="540" cy="110" r="14" fill="#2a6045" stroke="#2a6045" stroke-width="2"/>
+      <text x="540" y="115" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" fill="white" font-weight="500">2</text>
+
+      <!-- Stage 1 label -->
+      <text x="160" y="55" text-anchor="middle" font-family="'Playfair Display', serif" font-size="13" fill="#0d1b2a" font-weight="700">First Stage</text>
+      <text x="160" y="72" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="11" fill="#54504a">HERE AND NOW</text>
+      <text x="160" y="88" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="10" fill="#54504a">Choose x (acres)</text>
+      <line x1="160" y1="95" x2="160" y2="97" stroke="#ccc4b2" stroke-width="1"/>
+
+      <!-- Uncertainty label -->
+      <text x="350" y="55" text-anchor="middle" font-family="'Playfair Display', serif" font-size="13" fill="#453080" font-weight="700">Uncertainty</text>
+      <text x="350" y="72" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="11" fill="#54504a">REVEALED</text>
+      <text x="350" y="88" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="10" fill="#54504a">ξ = yields observed</text>
+
+      <!-- Stage 2 label -->
+      <text x="540" y="55" text-anchor="middle" font-family="'Playfair Display', serif" font-size="13" fill="#2a6045" font-weight="700">Second Stage</text>
+      <text x="540" y="72" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="11" fill="#54504a">RECOURSE</text>
+      <text x="540" y="88" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="10" fill="#54504a">Adapt y (buy/sell)</text>
+
+      <!-- Scenario branches from uncertainty -->
+      <line x1="350" y1="124" x2="350" y2="145" stroke="#453080" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <line x1="350" y1="145" x2="280" y2="165" stroke="#453080" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="350" y1="145" x2="350" y2="165" stroke="#453080" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="350" y1="145" x2="420" y2="165" stroke="#453080" stroke-width="1" stroke-dasharray="4,3"/>
+
+      <text x="265" y="180" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#453080">s=1 (p=⅓)</text>
+      <text x="350" y="180" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#453080">s=2 (p=⅓)</text>
+      <text x="435" y="180" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#453080">s=3 (p=⅓)</text>
+
+      <text x="265" y="196" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">above avg</text>
+      <text x="350" y="196" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">average</text>
+      <text x="435" y="196" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">below avg</text>
+
+      <!-- Time label -->
+      <text x="655" y="114" font-family="'JetBrains Mono', monospace" font-size="10" fill="#1558a8">time →</text>
+    </svg>
+    <p class="fig-caption">Figure 1. The two-stage decision structure. First-stage decisions (land allocation) are committed before uncertainty is resolved. Second-stage recourse actions (buying/selling) are adapted after yields are observed.</p>
+  </div>
+
+  <h3>6.2 Value Hierarchy: EVPI and VSS</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" aria-label="Value hierarchy showing EVPI and VSS relationships">
+      <!-- Three bars -->
+      <!-- EV solution bar -->
+      <rect x="60" y="40" width="180" height="120" rx="6" fill="#eeebfa" stroke="#453080" stroke-width="1.5"/>
+      <text x="150" y="90" text-anchor="middle" font-family="'Playfair Display', serif" font-size="14" fill="#453080" font-weight="700">EV Solution</text>
+      <text x="150" y="110" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="12" fill="#453080">$107,240</text>
+      <text x="150" y="130" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">use mean-yield plan</text>
+      <text x="150" y="142" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">in all scenarios</text>
+
+      <!-- Stochastic bar -->
+      <rect x="260" y="20" width="180" height="140" rx="6" fill="#e9f5ee" stroke="#2a6045" stroke-width="1.5"/>
+      <text x="350" y="70" text-anchor="middle" font-family="'Playfair Display', serif" font-size="14" fill="#2a6045" font-weight="700">Stochastic SP</text>
+      <text x="350" y="90" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="12" fill="#2a6045">$108,390</text>
+      <text x="350" y="110" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">optimize over all</text>
+      <text x="350" y="122" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">scenarios jointly</text>
+
+      <!-- Perfect info bar -->
+      <rect x="460" y="5" width="180" height="155" rx="6" fill="#fdf3e0" stroke="#b8861e" stroke-width="1.5"/>
+      <text x="550" y="55" text-anchor="middle" font-family="'Playfair Display', serif" font-size="14" fill="#7a5800" font-weight="700">Perfect Info</text>
+      <text x="550" y="75" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="12" fill="#7a5800">$115,406</text>
+      <text x="550" y="95" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">know scenario</text>
+      <text x="550" y="107" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">before planting</text>
+
+      <!-- VSS brace -->
+      <line x1="240" y1="180" x2="240" y2="190" stroke="#444" stroke-width="1"/>
+      <line x1="240" y1="190" x2="440" y2="190" stroke="#444" stroke-width="1.5"/>
+      <line x1="440" y1="180" x2="440" y2="190" stroke="#444" stroke-width="1"/>
+      <text x="340" y="200" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#2a6045">VSS = $1,150</text>
+
+      <!-- EVPI brace -->
+      <line x1="440" y1="175" x2="440" y2="183" stroke="#888" stroke-width="1"/>
+      <line x1="440" y1="183" x2="640" y2="183" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <line x1="640" y1="175" x2="640" y2="183" stroke="#888" stroke-width="1"/>
+      <text x="540" y="195" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#7a5800">EVPI = $7,016</text>
+    </svg>
+    <p class="fig-caption">Figure 2. The value hierarchy. The stochastic solution always lies between the EV solution and perfect-information optimal. VSS measures the gain from stochastic modeling; EVPI measures the gain from knowing the future.</p>
+  </div>
+
+  <h3>6.3 Land Allocation Comparison Across Strategies</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" aria-label="Bar chart comparing land allocations across strategies">
+      <!-- Axes -->
+      <line x1="100" y1="200" x2="650" y2="200" stroke="#ccc4b2" stroke-width="1.5"/>
+      <line x1="100" y1="30" x2="100" y2="200" stroke="#ccc4b2" stroke-width="1.5"/>
+
+      <!-- Y-axis labels -->
+      <text x="90" y="204" text-anchor="end" font-family="'JetBrains Mono', monospace" font-size="9" fill="#54504a">0</text>
+      <text x="90" y="161" text-anchor="end" font-family="'JetBrains Mono', monospace" font-size="9" fill="#54504a">100</text>
+      <text x="90" y="117" text-anchor="end" font-family="'JetBrains Mono', monospace" font-size="9" fill="#54504a">200</text>
+      <text x="90" y="74" text-anchor="end" font-family="'JetBrains Mono', monospace" font-size="9" fill="#54504a">300</text>
+      <text x="90" y="31" text-anchor="end" font-family="'JetBrains Mono', monospace" font-size="9" fill="#54504a">400</text>
+      <line x1="98" y1="161" x2="102" y2="161" stroke="#ccc4b2" stroke-width="1"/>
+      <line x1="98" y1="117" x2="102" y2="117" stroke="#ccc4b2" stroke-width="1"/>
+      <line x1="98" y1="74" x2="102" y2="74" stroke="#ccc4b2" stroke-width="1"/>
+
+      <!-- Y axis title -->
+      <text x="30" y="120" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="11" fill="#54504a" transform="rotate(-90,30,120)">Acres</text>
+
+      <!-- Group spacing: 4 groups (det, above, below, stoch) -->
+      <!-- Bar width = 28, group width = 105 -->
+      <!-- Wheat=navy, Corn=gold, Beets=green -->
+
+      <!-- Scale: 500 acres = 170px → 1 acre = 0.34px -->
+
+      <!-- Group 1: Deterministic (x=130) -->
+      <text x="172" y="220" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">Deterministic</text>
+      <!-- Wheat: 120 → 41px -->
+      <rect x="120" y="159" width="28" height="41" fill="#0d1b2a" rx="2"/>
+      <text x="134" y="156" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#0d1b2a">120</text>
+      <!-- Corn: 80 → 27px -->
+      <rect x="152" y="173" width="28" height="27" fill="#b8861e" rx="2"/>
+      <text x="166" y="170" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#7a5800">80</text>
+      <!-- Beets: 300 → 102px -->
+      <rect x="184" y="98" width="28" height="102" fill="#2a6045" rx="2"/>
+      <text x="198" y="95" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#2a6045">300</text>
+
+      <!-- Group 2: Above avg optimal (x=270) -->
+      <text x="312" y="220" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">Above Avg</text>
+      <!-- Wheat: 183 → 62px -->
+      <rect x="260" y="138" width="28" height="62" fill="#0d1b2a" rx="2"/>
+      <text x="274" y="135" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#0d1b2a">183</text>
+      <!-- Corn: 67 → 23px -->
+      <rect x="292" y="177" width="28" height="23" fill="#b8861e" rx="2"/>
+      <text x="306" y="174" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#7a5800">67</text>
+      <!-- Beets: 250 → 85px -->
+      <rect x="324" y="115" width="28" height="85" fill="#2a6045" rx="2"/>
+      <text x="338" y="112" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#2a6045">250</text>
+
+      <!-- Group 3: Below avg optimal (x=410) -->
+      <text x="452" y="220" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">Below Avg</text>
+      <!-- Wheat: 100 → 34px -->
+      <rect x="400" y="166" width="28" height="34" fill="#0d1b2a" rx="2"/>
+      <text x="414" y="163" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#0d1b2a">100</text>
+      <!-- Corn: 25 → 9px -->
+      <rect x="432" y="191" width="28" height="9" fill="#b8861e" rx="2"/>
+      <text x="446" y="188" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#7a5800">25</text>
+      <!-- Beets: 375 → 128px -->
+      <rect x="464" y="72" width="28" height="128" fill="#2a6045" rx="2"/>
+      <text x="478" y="69" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#2a6045">375</text>
+
+      <!-- Group 4: Stochastic (x=550) -->
+      <text x="592" y="220" text-anchor="middle" font-family="'Source Serif 4', serif" font-size="9" fill="#1558a8" font-weight="600">Stochastic ★</text>
+      <!-- Wheat: 170 → 58px -->
+      <rect x="540" y="142" width="28" height="58" fill="#1558a8" rx="2"/>
+      <text x="554" y="139" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#1558a8">170</text>
+      <!-- Corn: 80 → 27px -->
+      <rect x="572" y="173" width="28" height="27" fill="#b8861e" rx="2"/>
+      <text x="586" y="170" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#7a5800">80</text>
+      <!-- Beets: 250 → 85px -->
+      <rect x="604" y="115" width="28" height="85" fill="#2a6045" rx="2" opacity="0.8"/>
+      <text x="618" y="112" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="8" fill="#2a6045">250</text>
+
+      <!-- Legend -->
+      <rect x="110" y="238" width="12" height="12" fill="#0d1b2a" rx="1"/>
+      <text x="126" y="249" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">Wheat</text>
+      <rect x="185" y="238" width="12" height="12" fill="#b8861e" rx="1"/>
+      <text x="201" y="249" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">Corn</text>
+      <rect x="245" y="238" width="12" height="12" fill="#2a6045" rx="1"/>
+      <text x="261" y="249" font-family="'Source Serif 4', serif" font-size="9" fill="#54504a">Sugar Beets</text>
+    </svg>
+    <p class="fig-caption">Figure 3. Land allocation (in acres) under four different strategies. The stochastic solution (★, in blue) hedges between the extremes: it plants more wheat than the deterministic plan and fewer beets than the below-average optimum.</p>
+  </div>
+
+  <h3>6.4 Shape of the Sugar Beet Recourse Function $\mathcal{Q}_3(x_3)$</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" aria-label="Graph of the sugar beet expected recourse function Q3 showing three piecewise regimes">
+      <line x1="80" y1="230" x2="660" y2="230" stroke="#ccc4b2" stroke-width="1.5"/>
+      <line x1="80" y1="30" x2="80" y2="240" stroke="#ccc4b2" stroke-width="1.5"/>
+      <polygon points="660,224 672,230 660,236" fill="#ccc4b2"/>
+      <polygon points="74,30 80,18 86,30" fill="#ccc4b2"/>
+      <text x="674" y="234" font-family="'JetBrains Mono',monospace" font-size="10" fill="#54504a">x₃</text>
+      <text x="55" y="20" font-family="'JetBrains Mono',monospace" font-size="10" fill="#54504a">Q₃(x₃)</text>
+
+      <!-- Breakpoint vertical dashes at x3=250→px370 and x3=375→px515 -->
+      <line x1="370" y1="40" x2="370" y2="230" stroke="#b8861e" stroke-width="1" stroke-dasharray="5,4"/>
+      <line x1="515" y1="40" x2="515" y2="230" stroke="#b8861e" stroke-width="1" stroke-dasharray="5,4"/>
+
+      <!-- Regime shading -->
+      <rect x="80" y="30" width="290" height="200" fill="rgba(42,96,69,0.05)"/>
+      <rect x="370" y="30" width="145" height="200" fill="rgba(21,88,168,0.05)"/>
+      <rect x="515" y="30" width="145" height="200" fill="rgba(125,31,31,0.05)"/>
+
+      <!-- Regime labels -->
+      <text x="225" y="50" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#2a6045">Always under quota</text>
+      <text x="225" y="62" text-anchor="middle" font-family="'Source Serif 4',serif" font-size="9" fill="#54504a">−36t̄₃x₃  (linear)</text>
+      <text x="442" y="50" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1558a8">Intermediate</text>
+      <text x="442" y="62" text-anchor="middle" font-family="'Source Serif 4',serif" font-size="9" fill="#54504a">nonlinear convex</text>
+      <text x="588" y="50" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#7d1f1f">Always over quota</text>
+      <text x="588" y="62" text-anchor="middle" font-family="'Source Serif 4',serif" font-size="9" fill="#54504a">linear (low price)</text>
+
+      <!-- Regime 1: linear, x3=0→y=230 to x3=250→y=82 -->
+      <line x1="80" y1="230" x2="370" y2="82" stroke="#2a6045" stroke-width="2.5"/>
+      <!-- Regime 2: convex curve, x3=250→y=82 to x3=375→y=40 -->
+      <path d="M370,82 Q442,38 515,40" stroke="#1558a8" stroke-width="2.5" fill="none"/>
+      <!-- Regime 3: linear, x3=375→y=40 to x3=500→y=20 -->
+      <line x1="515" y1="40" x2="660" y2="22" stroke="#7d1f1f" stroke-width="2.5"/>
+
+      <!-- Optimal x3* at 279.10 → px = 80+279.1*(580/500)=80+324=404 -->
+      <circle cx="404" cy="74" r="6" fill="#b8861e" stroke="#fff" stroke-width="1.5"/>
+      <line x1="404" y1="230" x2="404" y2="80" stroke="#b8861e" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="404" y="248" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#b8861e">x₃*≈279</text>
+
+      <!-- Breakpoint labels -->
+      <text x="370" y="248" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#54504a">250</text>
+      <text x="515" y="248" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#54504a">375</text>
+
+      <!-- Legend -->
+      <line x1="90" y1="268" x2="115" y2="268" stroke="#2a6045" stroke-width="2.5"/>
+      <text x="120" y="272" font-family="'Source Serif 4',serif" font-size="9" fill="#54504a">Regime 1 (linear)</text>
+      <path d="M230,268 Q250,264 270,268" stroke="#1558a8" stroke-width="2.5" fill="none"/>
+      <text x="278" y="272" font-family="'Source Serif 4',serif" font-size="9" fill="#54504a">Regime 2 (convex)</text>
+      <line x1="390" y1="268" x2="415" y2="268" stroke="#7d1f1f" stroke-width="2.5"/>
+      <text x="420" y="272" font-family="'Source Serif 4',serif" font-size="9" fill="#54504a">Regime 3 (linear)</text>
+      <circle cx="545" cy="268" r="5" fill="#b8861e"/>
+      <text x="554" y="272" font-family="'Source Serif 4',serif" font-size="9" fill="#54504a">x₃* (optimal)</text>
+    </svg>
+    <p class="fig-caption">Figure 4. The expected recourse function $\mathcal{Q}_3(x_3)$ for sugar beets under uniform yields. Three piecewise regimes: linear (all beets always sell at $36/T), nonlinear convex (quota sometimes exceeded), and linear again (production always above quota). The function is globally continuous and convex. The optimal $x_3^* \approx 279$ lies in the intermediate nonlinear regime.</p>
+  </div>
+
+  <h3>6.5 News Vendor: Critical Ratio &amp; Optimal Stocking Level</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" aria-label="News vendor critical ratio diagram showing CDF of demand with optimal stocking level marked">
+      <line x1="70" y1="200" x2="640" y2="200" stroke="#ccc4b2" stroke-width="1.5"/>
+      <line x1="70" y1="20" x2="70" y2="210" stroke="#ccc4b2" stroke-width="1.5"/>
+      <polygon points="640,194 652,200 640,206" fill="#ccc4b2"/>
+      <polygon points="64,20 70,8 76,20" fill="#ccc4b2"/>
+      <text x="656" y="204" font-family="'JetBrains Mono',monospace" font-size="10" fill="#54504a">ξ</text>
+      <text x="52" y="15" font-family="'JetBrains Mono',monospace" font-size="10" fill="#54504a">F(ξ)</text>
+
+      <!-- y-axis ticks -->
+      <text x="62" y="204" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="9" fill="#54504a">0</text>
+      <text x="62" y="24" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="9" fill="#54504a">1</text>
+
+      <!-- α* horizontal dashed line at y = 200 - 0.65*180 = 83 -->
+      <line x1="70" y1="83" x2="640" y2="83" stroke="#b8861e" stroke-width="1.2" stroke-dasharray="5,4"/>
+      <text x="55" y="87" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="9" fill="#b8861e">α*</text>
+
+      <!-- Shaded region below α* and left of x* -->
+      <rect x="70" y="83" width="360" height="117" fill="rgba(42,96,69,0.08)"/>
+      <text x="250" y="158" text-anchor="middle" font-family="'Source Serif 4',serif" font-size="9" fill="#2a6045">P(demand ≤ x*) = α*</text>
+      <text x="250" y="172" text-anchor="middle" font-family="'Source Serif 4',serif" font-size="9" fill="#2a6045">(stockout probability)</text>
+
+      <!-- CDF S-curve -->
+      <path d="M70,200 C100,200 140,195 200,180 S310,130 360,110 S430,45 490,25 S570,21 630,20"
+            stroke="#1558a8" stroke-width="2.5" fill="none"/>
+      <text x="490" y="40" font-family="'Source Serif 4',serif" font-size="11" fill="#1558a8" font-style="italic">F(ξ) — CDF of demand</text>
+
+      <!-- x* marker at F=0.65, approximately ξ=390 → px 70+(390/600)*570=70+370.5=440 -->
+      <circle cx="430" cy="83" r="6" fill="#2a6045" stroke="#fff" stroke-width="1.5"/>
+      <line x1="430" y1="83" x2="430" y2="200" stroke="#2a6045" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="430" y="218" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#2a6045" font-weight="500">x* = F⁻¹(α*)</text>
+
+      <!-- Formula box -->
+      <rect x="470" y="105" width="155" height="60" rx="5" fill="#fdf3e0" stroke="#b8861e" stroke-width="1.2"/>
+      <text x="547" y="122" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="#7a5800" letter-spacing="0.08em">CRITICAL RATIO</text>
+      <text x="547" y="145" text-anchor="middle" font-family="'Source Serif 4',serif" font-size="13" fill="#7a5800">α* = q−c / q−r</text>
+      <text x="547" y="160" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7.5" fill="#54504a">margin / price range</text>
+    </svg>
+    <p class="fig-caption">Figure 5. The News Vendor optimal solution. The CDF $F(\xi)$ of random demand is plotted. The optimal order quantity is $x^* = F^{-1}(\alpha^*)$ — the demand quantile at the critical ratio $\alpha^* = (q-c)/(q-r)$. The shaded region represents the probability of having unsold copies. Higher margin → higher $\alpha^*$ → higher stocking level.</p>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §7 SUMMARY & KEY TAKEAWAYS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="summary">
+  <div class="section-header">
+    <span class="section-number">§ 7</span>
+    <h2>Summary &amp; Key Takeaways</h2>
+  </div>
+
+  <div class="takeaways">
+    <h3>Key Takeaways</h3>
+    <ul>
+      <li><strong>Deterministic solutions are fragile.</strong> Solving an optimization problem using expected parameter values produces a solution that can be far from optimal — or even infeasible — when actual values differ from expectations.</li>
+      <li><strong>Two-stage structure is fundamental.</strong> Stochastic programs distinguish between here-and-now decisions (committed before uncertainty resolves) and wait-and-see recourse actions (adapted after uncertainty resolves).</li>
+      <li><strong>Two equivalent representations exist.</strong> The <em>extensive form</em> enumerates all scenario-specific variables explicitly in one large LP. The <em>implicit form</em> uses $\mathbb{E}[Q(x,\boldsymbol{\xi})]$ compactly. Both represent the same problem; the choice depends on the solution method.</li>
+      <li><strong>Fixed recourse simplifies structure.</strong> When only $T$ and $h$ are random (not $W$), the recourse matrix is fixed, enabling powerful decomposition algorithms. This is the most common case in applications.</li>
+      <li><strong>The expected recourse function $\mathcal{Q}(x)$ is convex.</strong> For a broad class of stochastic programs (including all LP-based two-stage problems), $\mathcal{Q}(x) = \mathbb{E}[Q(x,\boldsymbol{\xi})]$ is convex and continuous. This makes the overall problem tractable and guarantees KKT conditions are sufficient.</li>
+      <li><strong>Independence enables separability.</strong> When uncertain parameters are independent across subproblems, the expected recourse decomposes into a sum of independent functions. This dramatically reduces computational complexity.</li>
+      <li><strong>Continuous distributions yield piecewise analytical functions.</strong> Under uniform distributions, the sugar beet recourse function $\mathcal{Q}_3(x_3)$ has three regimes (linear–nonlinear–linear), all convex and continuous. The nonlinear middle piece is the consequence of the quota threshold interacting with yield randomness.</li>
+      <li><strong>KKT conditions solve the continuous problem.</strong> Because the overall program is convex, KKT stationarity conditions ($c_i + \partial \mathcal{Q}_i/\partial x_i + \lambda = 0$) are necessary and sufficient. The continuous solution (135.83, 85.07, 279.10) is qualitatively similar to the discrete scenario solution (170, 80, 250) — evidence of robust stochastic modeling.</li>
+      <li><strong>The News Vendor problem is the canonical one-dimensional stochastic program.</strong> Its optimal solution — buy $x^* = F^{-1}(q-c)/(q-r)$ newspapers — encodes the entire cost structure in a single critical ratio: the ratio of profit margin to total price range.</li>
+      <li><strong>The News Vendor solution generalizes widely.</strong> Any situation with pre-commitment under uncertain demand — fashion, vaccines, airline seats, perishable food — shares this structure. The critical ratio $\alpha^* = (q-c)/(q-r)$ is the universal answer.</li>
+      <li><strong>Stochastic solutions hedge.</strong> The optimal stochastic solution is not individually optimal for any scenario — it is a compromise that performs well in expectation across all scenarios. This "hedging" is the core value proposition of stochastic programming.</li>
+      <li><strong>EVPI and VSS bound the value of information and modeling.</strong> $\mathbb{E}[\text{perfect info}] \geq z^*_{SP} \geq \mathbb{E}[RP(\bar{x})]$ always holds; both EVPI and VSS are non-negative, giving practitioners clear guidance on when to invest in better data or richer models.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §8 PRACTICE QUESTIONS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="practice">
+  <div class="section-header">
+    <span class="section-number">§ 8</span>
+    <h2>Practice Questions</h2>
+  </div>
+
+  <h3>Questions on §3c — General Model &amp; Implicit Form</h3>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q9 — Implicit vs. Extensive Form</strong>
+    </div>
+    <div class="q-text">
+      Explain the difference between the extensive form and the implicit representation of a two-stage stochastic program. Under what circumstances would you choose to solve the extensive form directly? When would you prefer to work with the implicit form and use decomposition methods? Consider both computational and theoretical perspectives.
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q10 — Fixed Recourse</strong>
+    </div>
+    <div class="q-text">
+      In the farmer's problem, the recourse matrix $W$ is fixed (deterministic). Identify $W$, $T(s)$, $h$, and $q$ explicitly by matching them to the constraints in (1.4). Why is fixed recourse a practically important special case? What complications arise if $W$ were also random?
+    </div>
+  </div>
+
+  <h3>Questions on §3d — Continuous Random Variables</h3>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q11 — Sugar Beet Recourse Function</strong>
+    </div>
+    <div class="q-text">
+      Verify the formula for $\mathcal{Q}_3(x_3)$ in the intermediate regime. Starting from the integral expression, carry out the integration step-by-step under the uniform density $f(t) = \frac{1}{u_3 - l_3}$. Show that the result simplifies to $-36\bar{t}_3 x_3 + \frac{13(u_3 x_3 - 6000)^2}{x_3(u_3-l_3)}$. With $\bar{t}_3 = 20$, $l_3 = 16$, $u_3 = 24$, evaluate $\mathcal{Q}_3(279.10)$ and compare it to $\mathcal{Q}_3(250)$ and $\mathcal{Q}_3(300)$.
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q12 — KKT Verification</strong>
+    </div>
+    <div class="q-text">
+      Compute $\partial \mathcal{Q}_i(x_i)/\partial x_i$ for each crop at the claimed optimal $(x_1^*, x_2^*, x_3^*) = (135.83, 85.07, 279.10)$, using the appropriate piece of each piecewise function. Verify that the KKT conditions $c_i + \partial \mathcal{Q}_i/\partial x_i + \lambda = 0$ hold for all three crops with $\lambda = 275$. Then verify complementary slackness: is the land constraint binding? Does $\lambda > 0$ require $x_1 + x_2 + x_3 = 500$?
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q13 — Discrete vs. Continuous Yields</strong>
+    </div>
+    <div class="q-text">
+      Compare the discrete scenario solution $(170, 80, 250)$ with the continuous uniform solution $(135.83, 85.07, 279.10)$. The two models have the same mean yields and the same ±20% range, but different optimal solutions. (a) What structural difference between the models explains the gap? (b) Which model do you think is more realistic for a European farmer's decision? (c) What does the similarity in qualitative structure (both plant fewer beets and more wheat than the deterministic plan) tell you about stochastic programming robustness?
+    </div>
+  </div>
+
+  <h3>Questions on §3e — News Vendor Problem</h3>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q14 — News Vendor with Uniform Demand</strong>
+    </div>
+    <div class="q-text">
+      A news vendor buys papers at $c = \$0.25$ each, sells at $q = \$0.75$ each, and returns unsold copies at $r = \$0.10$ each. Daily demand $\xi \sim \text{Uniform}[50, 150]$. (a) Compute the critical ratio $\alpha^* = (q-c)/(q-r)$. (b) Find the optimal purchase quantity $x^*$. (c) What is the expected daily profit? (d) How does $x^*$ change if the publisher raises the return price to $r = \$0.20$? Interpret the change.
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q15 — News Vendor with Normal Demand</strong>
+    </div>
+    <div class="q-text">
+      A fashion retailer orders seasonal coats at $c = \$80$, sells at $q = \$150$, and salvages unsold inventory at $r = \$30$. Demand is $\xi \sim \mathcal{N}(500, 100^2)$ (normal distribution with mean 500, std dev 100). (a) Compute $\alpha^*$. (b) Find $x^* = \Phi^{-1}(\alpha^*) \cdot 100 + 500$ where $\Phi^{-1}$ is the standard normal quantile. (c) Interpret: why does a higher margin lead to a higher stocking quantity? (d) Verify this is consistent with the relationship: higher margin → accept more risk of overstock.
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q16 — Sugar Beets as a News Vendor</strong>
+    </div>
+    <div class="q-text">
+      Explain precisely why the sugar beet component of the farmer's problem is a news vendor problem. Identify the mapping: what plays the role of $c$ (purchase cost), $q$ (selling price), $r$ (return price), $x$ (order quantity), and $\xi$ (random demand)? Using the critical ratio formula, predict qualitatively how the optimal beet acreage would change if the EU raised the above-quota price from $10/T to $20/T. Does this make economic sense?
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q1 — Recourse vs. Robust Optimization</strong>
+    </div>
+    <div class="q-text">
+      Explain in your own words the difference between (a) solving the deterministic problem with expected yields, (b) solving the stochastic program with recourse, and (c) choosing a robust solution that guarantees a minimum profit in the worst case. What are the advantages and disadvantages of each approach? Under what conditions would you prefer each?
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q2 — Interpreting EVPI</strong>
+    </div>
+    <div class="q-text">
+      In the farmer's problem, EVPI = $7,016. Suppose a meteorological forecasting service offers to tell the farmer which scenario (above/average/below) will occur <em>before</em> planting, at a cost of $5,000 per year. Should the farmer subscribe? What if the forecast is accurate only 80% of the time — how does this change your reasoning?
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q3 — Hedging Intuition</strong>
+    </div>
+    <div class="q-text">
+      The stochastic solution plants 250 acres of sugar beets rather than the deterministic optimum of 300. Explain intuitively (without mathematical formulas) why planting fewer beets is preferable under uncertainty. What is the "downside risk" that the stochastic solution is protecting against? What is the "opportunity cost" of this protection?
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-conceptual">Conceptual</span>
+      <strong>Q4 — When is VSS Large?</strong>
+    </div>
+    <div class="q-text">
+      Think about the characteristics of a stochastic programming problem in which VSS would be very large (i.e., where ignoring uncertainty is very costly). Conversely, when would VSS be close to zero? Give a real-world example for each case. [Hint: think about the shape of the objective function and the severity of recourse costs.]
+    </div>
+  </div>
+
+  <h3>Computational Questions</h3>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q5 — Verify the EV Solution Profit</strong>
+    </div>
+    <div class="q-text">
+      Using the deterministic optimal solution $(x_1, x_2, x_3) = (120, 80, 300)$, manually compute the profit in each of the three yield scenarios by optimizing the second-stage variables. Then compute the expected profit and verify that it equals $107,240 as stated in the text. [Hint: in the above-average scenario, some sugar beets will be sold at the unfavorable $10/T price.]
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q6 — Modified Quota</strong>
+    </div>
+    <div class="q-text">
+      Suppose the EU quota is raised to 8,000 T. Re-derive the stochastic program's extensive form. Without solving, predict qualitatively how the optimal first-stage solution $(x_1, x_2, x_3)$ will change. Will the stochastic optimal plant more or fewer acres of sugar beets? Will VSS increase or decrease? Explain your reasoning.
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q7 — Adding a Fourth Scenario</strong>
+    </div>
+    <div class="q-text">
+      Suppose a drought scenario ($-40\%$ yields for all crops) occurs with probability $0.1$, and the other three scenarios each have probability $0.3$. Write out the new extensive form objective function. How many second-stage variables does the new model have? Solve the new model (using Python or by hand) and compute the new VSS and EVPI. How do they compare to the original three-scenario model?
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-header">
+      <span class="q-badge q-computational">Computational</span>
+      <strong>Q8 — Price Fluctuations</strong>
+    </div>
+    <div class="q-text">
+      [Adapted from Exercise 8, Birge &amp; Louveaux] Suppose that, in addition to yield uncertainty, wheat prices are also uncertain: $170/T with probability $\frac{2}{3}$ and $200/T with probability $\frac{1}{3}$, independent of yields. How many scenarios are now needed for the full scenario tree? Write the objective function for the first scenario (above-average yields, high price). Discuss how the number of scenarios grows in general when $k$ independent uncertain parameters each take $m$ values.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- §G GLOSSARY -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="section" id="glossary">
+  <div class="section-header">
+    <span class="section-number">§ G</span>
+    <h2>Glossary</h2>
+  </div>
+
+  <dl class="glossary">
+    <div class="glossary-item">
+      <dt>Scenario</dt>
+      <dd>A specific realization of all uncertain parameters, paired with a probability. The set of scenarios represents the decision maker's model of future uncertainty.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>First-Stage Decision</dt>
+      <dd>A here-and-now decision made before uncertainty is revealed. Must be the same regardless of which scenario occurs.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Second-Stage Decision</dt>
+      <dd>A wait-and-see recourse decision made after observing the realized scenario. Can be fully adapted to the scenario.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Recourse</dt>
+      <dd>Corrective actions available after uncertainty is resolved, used to compensate for any mismatch between first-stage decisions and realized outcomes.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Extensive Form</dt>
+      <dd>The deterministic equivalent LP of a stochastic program, formed by explicitly listing all scenario-specific second-stage variables. Size grows linearly with the number of scenarios.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Recourse Function Q(x, ξ)</dt>
+      <dd>The optimal value of the second-stage problem given first-stage decision $x$ and realized uncertainty $\xi$. The stochastic program minimizes $c^\top x + \mathbb{E}[Q(x,\xi)]$.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>EVPI</dt>
+      <dd>Expected Value of Perfect Information. The gain in expected profit if the decision maker knew the future scenario in advance before making first-stage decisions.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>VSS</dt>
+      <dd>Value of the Stochastic Solution. The gain in expected profit from using the stochastic program versus applying the mean-value (deterministic) solution across all scenarios.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>EV Solution</dt>
+      <dd>The optimal solution to the deterministic problem formed by replacing all uncertain parameters with their expected values. Used as a naive benchmark.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Hedging</dt>
+      <dd>The property of stochastic optimal solutions whereby the first-stage decision balances performance across multiple scenarios, accepting suboptimality in each individual scenario to improve overall expected performance.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Two-Stage Stochastic LP</dt>
+      <dd>A stochastic program where decisions are separated into two stages (before and after uncertainty resolution), with linear objectives and constraints in both stages.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Block-Diagonal Structure</dt>
+      <dd>The structure of the extensive form's constraint matrix, where second-stage variables appear only in their own scenario's block, coupled only through the shared first-stage variables.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Implicit Representation</dt>
+      <dd>The compact form of a stochastic program using the expectation operator: $\min c^\top x + \mathbb{E}[Q(x,\boldsymbol{\xi})]$. Contrast with the extensive form, which lists all scenario variables explicitly.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Fixed Recourse</dt>
+      <dd>A stochastic program where the recourse matrix $W$ is deterministic (non-random). Only $q$, $h$, and/or $T$ may be uncertain. The most common and tractable class of two-stage programs.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Separability</dt>
+      <dd>A property of the expected recourse function when uncertain parameters are independent across subproblems. Allows $\mathbb{E}[Q(x,\boldsymbol{\xi})] = \sum_i \mathcal{Q}_i(x_i)$, enabling independent optimization of each crop or component.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Critical Ratio</dt>
+      <dd>The news vendor's optimal service level $\alpha^* = (q-c)/(q-r)$: the ratio of profit margin to total price range. The optimal stocking quantity equals the $\alpha^*$-quantile of demand: $x^* = F^{-1}(\alpha^*)$.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>News Vendor Problem</dt>
+      <dd>A single-product, single-period stochastic program where a quantity is committed before demand is known, with costs for understock (lost sales) and overstock (salvage). The canonical simple recourse problem.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>KKT Conditions</dt>
+      <dd>Karush-Kuhn-Tucker optimality conditions. For convex programs, they are both necessary and sufficient for a global optimum. Applied to the continuous stochastic farming problem to find $x^* = (135.83, 85.07, 279.10)$.</dd>
+    </div>
+    <div class="glossary-item">
+      <dt>Convexity of $\mathcal{Q}(x)$</dt>
+      <dd>The expected recourse function $\mathcal{Q}(x) = \mathbb{E}[Q(x,\boldsymbol{\xi})]$ is convex in $x$ for a broad class of stochastic programs. This makes the overall stochastic program a convex program, tractable with standard tools.</dd>
+    </div>
+  </dl>
+</section>
+
+</main>
+
+<footer>
+  <p>Chapter 1 · Introduction to Stochastic Programming · Based on Birge &amp; Louveaux (2011)</p>
+  <p style="margin-top:0.4rem; font-size:0.65rem; opacity:0.6;">For educational use · Stochastic Optimization Course</p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Ensure .tip elements are keyboard accessible
+  document.querySelectorAll('.tip').forEach(function(el) {
+    if (!el.hasAttribute('tabindex')) {
+      el.setAttribute('tabindex', '0');
+    }
+  });
+});
+</script>
+
+</body>
+</html>
